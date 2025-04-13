@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'Admin.apps.AdminConfig'
 ]
 
-CORS_ORIGIN_ALLOw_ALL = True
+CORS_ORIGIN_ALLOw_ALL = True # Không tốt khi chạy production 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -81,13 +81,13 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn.
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
+        'NAME': 'studentManage',
         'USER': 'postgres',
-        'PASSWORD': 'RfcPqcxYEyJSmudhLrKRmLtkGgBpHnTc', # will be hided in the future.
-        'HOST': 'postgres.railway.internal',
+        'PASSWORD': 'hust2025oneluv',
+        'HOST': 'student-manage.cluyw080s70y.ap-southeast-2.rds.amazonaws.com',
         'PORT': '5432'
     }
 }
