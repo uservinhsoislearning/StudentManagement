@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import DBINFO as INFO
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,10 +85,10 @@ WSGI_APPLICATION = 'server.wsgi.application'
 DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn.
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'studentManage',
-        'USER': 'postgres',
-        'PASSWORD': 'hust2025oneluv',
-        'HOST': 'student-manage.cluyw080s70y.ap-southeast-2.rds.amazonaws.com',
+        'NAME': INFO.DB_NAME,
+        'USER': INFO.DB_USER,
+        'PASSWORD': INFO.DB_PASSWORD,
+        'HOST': INFO.DB_HOST,
         'PORT': '5432'
     }
 }
