@@ -4,7 +4,7 @@ from DBApp.models import Student
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model=Student
-        fields=('id',
+        fields=('student_id',
                 'student_name',
                 'student_dob',
                 'student_gender',
