@@ -5,4 +5,5 @@ class UserloginSerializer(serializers.ModelSerializer):
     class Meta:
         model=Userlogin
         fields=('username',
-                'password')
+                'password',
+                'useremail')

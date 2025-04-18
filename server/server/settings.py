@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn.
+DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn. (resolved)
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': INFO.DB_NAME,
