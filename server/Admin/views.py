@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 # from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from Admin.models import Student
+from DBApp.models import Student
 from Admin.serializers import StudentSerializer
 # Create your views here.
 

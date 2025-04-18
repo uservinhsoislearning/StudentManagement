@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'SinhVienApp.apps.SinhvienappConfig',
     'GiaoVienApp.apps.GiaovienappConfig',
-    'Admin.apps.AdminConfig'
+    'Admin.apps.AdminConfig',
+    'Login.apps.LoginConfig',
+    'DBApp'
 ]
 
 CORS_ORIGIN_ALLOw_ALL = True # Không tốt khi chạy production 
