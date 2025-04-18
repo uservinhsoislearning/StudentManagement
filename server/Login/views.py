@@ -31,19 +31,21 @@ def userLoginAPI(request):
     #     user_data = JSONParser().parse(request) #input: new password, confirm new password
     #     if (user_data['new_password'] == user_data['confirm']): # doan nay tu thay:v
             
-
-def userRegisterAPI(request):
+@csrf_exempt
+def userRegisterAPI(request): # thử chứ đừng dùng, bởi chỉ admin được tạo tài khoản
     if request.method == 'POST':
         user_data = JSONParser().parse(request)
-        user_data_serializer = UserloginSerializer(data=user_data)
         try:
-            Userlogin.objects.get(username=user_data['username'])
+            user = Userlogin.objects.get(username=user_data['username'])
             return JsonResponse("Tên tài khoản này đã tồn tại, vui lòng chọn tên khác.")
         except Userlogin.DoesNotExist:
+            user_data_serializer = UserloginSerializer(data=user_data)
             if user_data_serializer.is_valid():
+                user_data_serializer.save()
                 return JsonResponse("Thêm tài khoản thành công!", safe=False)
             return JsonResponse("Hãy thử lại", safe=False)
 
+@csrf_exempt
 def forgotPassword(request):
     if request.method == 'POST':
         user_data = JSONParser().parse(request)
