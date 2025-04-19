@@ -16,39 +16,16 @@ from Login.serializers import UserloginSerializer
 def userLoginAPI(request):
     if request.method == 'POST':
         user_data = JSONParser().parse(request)
-        if (user_data['username']):
-            if not user_data['password']:
-                return JsonResponse("Bạn cần điền đầy đủ thông tin đăng nhập!.", safe=False)
-            if not user_data['usertype']:
-                return JsonResponse("Bạn cần chọn vai trò đăng nhập!", safe=False)
-            try:
-                user = Userlogin.objects.get(username=user_data['username'])
-                if user_data['usertype'] != user.usertype:
-                    return JsonResponse("Bạn chọn sai vai trò!", safe=False)
-                if check_password(user_data['password'], user.password):
-                    return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username}) #Dang nhap thanh cong
-                else:
-                    return JsonResponse("Mật khẩu không đúng!",safe=False) #Mat khau sai
-            except Userlogin.DoesNotExist:
-                return JsonResponse("Tài khoản không tồn tại!",safe=False) #Khong co nguoi dung
-            
-        if (user_data['useremail']):
-            if not user_data['password']:
-                return JsonResponse("Bạn cần điền đầy đủ thông tin đăng nhập!", safe=False)
-            if not user_data['usertype']:
-                return JsonResponse("Bạn cần chọn vai trò đăng nhập!", safe=False)
-            try:
-                user = Userlogin.objects.get(useremail=user_data['useremail'])
-                if user_data['usertype'] != user.usertype:
-                    return JsonResponse("Bạn chọn sai vai trò!", safe=False)
-                if check_password(user_data['password'], user.password):
-                    return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username}) #Dang nhap thanh cong
-                else:
-                    return JsonResponse("Mật khẩu không đúng!",safe=False) #Mat khau sai
-            except Userlogin.DoesNotExist:
-                return JsonResponse("Tài khoản không tồn tại!",safe=False) #Khong co nguoi dung
-        
-        return JsonResponse("Bạn cần điền đầy đủ thông tin đăng nhập!", safe=False)
+        if (not user_data['useremail'] or not user_data['password']):
+            return JsonResponse("Bạn cần điền đầy đủ thông tin đăng nhập!.", safe=False)
+        try:
+            user = Userlogin.objects.get(useremail=user_data['useremail'])
+            if check_password(user_data['password'], user.password):
+                return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username}) #Dang nhap thanh cong
+            else:
+                return JsonResponse("Mật khẩu không đúng!",safe=False) #Mat khau sai
+        except Userlogin.DoesNotExist:
+            return JsonResponse("Tài khoản không tồn tại!",safe=False) #Khong co nguoi dung
     # elif request.method == 'PUT': #Thay mat khau
     #     user_data = JSONParser().parse(request) #input: new password, confirm new password
     #     if (user_data['new_password'] == user_data['confirm']): # doan nay tu thay:v
