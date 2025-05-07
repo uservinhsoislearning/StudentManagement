@@ -15,7 +15,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 
 
 class ClassSerializer(serializers.ModelSerializer):
-    class_teacher = TeacherSerializer(read_only=True)  # Nested serialization
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
 
     class Meta:
         model = Class

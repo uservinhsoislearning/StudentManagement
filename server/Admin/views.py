@@ -36,13 +36,13 @@ def classAPI(request,id=0):
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         classes_data=JSONParser().parse(request)
-        classes=Class.objects.get(EmployeeID = classes_data['class_id'])
+        classes=Class.objects.get(class_id = classes_data['class_id'])
         classes_serializer = ClassSerializer(classes, data=classes_data)
         if classes_serializer.is_valid():
             classes_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        classes=Class.objects.get(ClassID=id)
+        classes=Class.objects.get(class_id=id)
         classes.delete()
         return JsonResponse("Xóa lớp thành công!",safe=False)
