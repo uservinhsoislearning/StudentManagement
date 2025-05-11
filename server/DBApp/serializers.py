@@ -11,7 +11,11 @@ class AdminSerializer(serializers.ModelSerializer):
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
-        fields = '__all__'
+        fields = ('teacher_name',
+                  'teacher_gender',
+                  'teacher_email',
+                  'teacher_classes',
+                  'teacher_profession')
 
 
 class ClassSerializer(serializers.ModelSerializer):
