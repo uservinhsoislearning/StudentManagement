@@ -49,7 +49,7 @@ def teacherAPI(request,id=0):
     if request.method == 'GET':
         teachers=Teacher.objects.all()
         teachers_serializer = TeacherSerializer(teachers,many=True)
-        return JsonResponse(TeacherSerializer.data, safe=False)
+        return JsonResponse(teachers_serializer.data, safe=False)
     elif request.method == 'POST':
         teachers_data=JSONParser().parse(request)
         teachers_serializer=TeacherSerializer(data=teachers_data)
@@ -59,7 +59,7 @@ def teacherAPI(request,id=0):
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         teachers_data=JSONParser().parse(request)
-        teachers=Teacher.objects.get(teacher_id = teachers_data['class_id'])
+        teachers=Teacher.objects.get(teacher_id = teachers_data['teacher_id'])
         teachers_serializer = TeacherSerializer(teachers, data=teachers_data)
         if teachers_serializer.is_valid():
             teachers_serializer.save()
@@ -69,3 +69,4 @@ def teacherAPI(request,id=0):
         teachers=Teacher.objects.get(class_id=id)
         teachers.delete()
         return JsonResponse("Xóa thầy/cô thành công!",safe=False)
+    
