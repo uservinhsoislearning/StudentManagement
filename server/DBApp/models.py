@@ -89,6 +89,18 @@ class Parent(models.Model):
     class Meta:
         db_table = 'parent'
 
+class Score(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+    score = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        db_table = 'score'
+        unique_together = ('student', 'class_field')  # Prevent duplicate score entries per class/student
 
 class Student(models.Model):
     student_id = models.AutoField(primary_key=True)
