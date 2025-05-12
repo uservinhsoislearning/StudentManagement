@@ -3,8 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from DBApp.models import Class,Teacher,Student
-from DBApp.serializers import ClassSerializer,TeacherSerializer,StudentSerializer
+from DBApp.models import Class,Teacher,Student,Classstudent
+from DBApp.serializers import ClassSerializer,TeacherSerializer,StudentSerializer,ClassstudentSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -74,14 +74,14 @@ def teacherAPI(request,id=0):
 def classStudentAPI(request):
     if request.method == 'POST':
         class_student_data=JSONParser().parse(request)
-        class_student_serializer=TeacherSerializer(data=class_student_data)
+        class_student_serializer=ClassstudentSerializer(data=class_student_data)
         if class_student_serializer.is_valid():
             class_student_serializer.save()
             return JsonResponse("Thêm học sinh vào lớp dữ liệu thành công!",safe=False)
         return JsonResponse("Cần nhập id học sinh và id lớp!",safe=False)
     elif request.method == 'DELETE':
         class_student_data=JSONParser().parse(request)
-        class_student=Teacher.objects.get(class_id=class_student_data['class_id'],student_id=class_student_data['student_id'])
+        class_student=Classstudent.objects.get(class_id=class_student_data['class_id'],student_id=class_student_data['student_id'])
         class_student.delete()
         return JsonResponse("Xóa học sinh khỏi lớp thành công!",safe=False)
     
