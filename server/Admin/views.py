@@ -3,8 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from DBApp.models import Class,Teacher,Student,Classstudent
-from DBApp.serializers import ClassSerializer,TeacherSerializer,StudentSerializer,ClassstudentSerializer
+from DBApp.models import Assignment,Class,Teacher,Student,Classstudent
+from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer,ClassstudentSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -96,3 +96,29 @@ def getStudentInClass(request, id=0):
             return JsonResponse(students_serializer.data, safe=False)
         except Class.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")
+        
+@csrf_exempt
+def AssignmentAPI(request, id=0):
+    if request.method == 'GET':
+        assignments=Assignment.objects.all()
+        assignments_serializer = AssignmentSerializer(assignments,many=True)
+        return JsonResponse(assignments_serializer.data, safe=False)
+    elif request.method == 'POST':
+        assignments_data=JSONParser().parse(request)
+        assignments_serializer=AssignmentSerializer(data=assignments_data)
+        if assignments_serializer.is_valid():
+            assignments_serializer.save()
+            return JsonResponse("Thêm bài tập thành công!",safe=False)
+        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+    elif request.method == 'PUT':
+        assignments_data=JSONParser().parse(request)
+        assignments=Assignment.objects.get(teacher_id = assignments_data['teacher_id'])
+        assignments_serializer = AssignmentSerializer(assignments, data=assignments_data)
+        if assignments_serializer.is_valid():
+            assignments_serializer.save()
+            return JsonResponse("Cập nhật bài tập thành công!", safe=False)
+        return JsonResponse("Lỗi không cập nhật được bài tập!", safe=False)
+    elif request.method == 'DELETE':
+        assignments=Assignment.objects.get(class_id=id)
+        assignments.delete()
+        return JsonResponse("Xóa bài tập thành công!",safe=False)
