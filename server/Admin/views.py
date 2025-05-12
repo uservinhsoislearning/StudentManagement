@@ -100,11 +100,12 @@ def getStudentInClass(request, id=0):
 @csrf_exempt
 def AssignmentAPI(request, id=0):
     if request.method == 'GET':
-        assignments=Assignment.objects.all()
+        assignments=Assignment.objects.filter(class_field = id)
         assignments_serializer = AssignmentSerializer(assignments,many=True)
         return JsonResponse(assignments_serializer.data, safe=False)
     elif request.method == 'POST':
         assignments_data=JSONParser().parse(request)
+        assignments_data['class_field'] = id
         assignments_serializer=AssignmentSerializer(data=assignments_data)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
@@ -112,8 +113,11 @@ def AssignmentAPI(request, id=0):
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         assignments_data=JSONParser().parse(request)
-        assignments=Assignment.objects.get(teacher_id = assignments_data['teacher_id'])
-        assignments_serializer = AssignmentSerializer(assignments, data=assignments_data)
+        assignments=Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
+        try:
+            assignments_serializer = AssignmentSerializer(assignments, data=assignments_data,class_field = id)
+        except Assignment.DoesNotExist:
+            return JsonResponse("Không tìm thấy bài tập cho lớp này!", safe=False)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
             return JsonResponse("Cập nhật bài tập thành công!", safe=False)
@@ -122,3 +126,4 @@ def AssignmentAPI(request, id=0):
         assignments=Assignment.objects.get(class_id=id)
         assignments.delete()
         return JsonResponse("Xóa bài tập thành công!",safe=False)
+        
