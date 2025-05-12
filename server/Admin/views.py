@@ -86,13 +86,13 @@ def classStudentAPI(request):
         return JsonResponse("Xóa học sinh khỏi lớp thành công!",safe=False)
 
 @csrf_exempt
-def getStudentInClass(request):
+def getStudentInClass(request, id=0):
     if request.method == 'POST':
         try:
             class_student_data=JSONParser().parse(request)
-            class_students = Classstudent.objects.get(class_id=class_student_data['class_id'])
+            class_students = Classstudent.objects.get(class_id=id)
             students = [cs.student for cs in class_students]
-            serializer = StudentSerializer(students, many=True)
-            return JsonResponse(serializer.data, safe=False)
+            students_serializer = StudentSerializer(students, many=True)
+            return JsonResponse(students_serializer.data, safe=False)
         except Class.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")

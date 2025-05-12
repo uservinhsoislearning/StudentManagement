@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'DBApp'
 ]
 
-CORS_ORIGIN_ALLOw_ALL = True # Không tốt khi chạy production 
+CORS_ORIGIN_ALLOW_ALL = True # Không tốt khi chạy production 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

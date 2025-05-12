@@ -1,4 +1,7 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+import os
 
 class Admin(models.Model):
     admin_id = models.AutoField(primary_key=True)
@@ -10,6 +13,37 @@ class Admin(models.Model):
 
     class Meta:
         db_table = 'admin'
+
+def assignment_upload_path(instance, filename):
+    return os.path.join('assignments', f"class_{instance.class_field.class_id}", filename)
+class Assignment(models.Model):
+    assignment_id = models.AutoField(primary_key=True)
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+    text_content = models.TextField(
+        max_length=10000,  # 1000 words roughly ~10,000 characters
+        blank=True,
+        null=True
+    )
+    file = models.FileField(
+        upload_to=assignment_upload_path,
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'docx'])]
+    )
+    day_uploaded = models.DateField(auto_now_add=True)
+    deadline = models.DateField()
+    score = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        db_table = 'assignment'
+
+    def clean(self):
+        if not self.text_content and not self.file:
+            raise ValidationError("Thiếu thông tin!")
 
 class Class(models.Model):
     class_id = models.AutoField(primary_key=True)

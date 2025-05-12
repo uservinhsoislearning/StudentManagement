@@ -14,7 +14,7 @@ urlpatterns = [
     re_path(r'^api/teachers$', views.teacherAPI),
     re_path(r'^api/teachers/([0-9]+)$', views.teacherAPI),
 
-    re_path(r'^api/classes/students', views.classStudentAPI),
+    re_path(r'^api/classes/students$', views.classStudentAPI),
 
-    re_path(r'^')
+    re_path(r'^api/classes/([0-9]+)/students$', views.getStudentInClass)
 ]
