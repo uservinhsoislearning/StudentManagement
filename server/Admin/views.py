@@ -113,11 +113,15 @@ def AssignmentAPI(request, id=0):
     elif request.method == 'POST':
         assignments_data=JSONParser().parse(request)
         assignments_data['class_field'] = id
+        assignments_data['file'] = None
         assignments_serializer=AssignmentSerializer(data=assignments_data)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
             return JsonResponse("Thêm bài tập thành công!",safe=False)
-        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+        return JsonResponse(
+        {"error": "Dữ liệu không hợp lệ.", "details": assignments_serializer.errors},
+        status=400
+    )
     elif request.method == 'PUT':
         assignments_data=JSONParser().parse(request)
         assignments=Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
@@ -133,6 +137,18 @@ def AssignmentAPI(request, id=0):
         assignments=Assignment.objects.get(class_id=id)
         assignments.delete()
         return JsonResponse("Xóa bài tập thành công!",safe=False)
+
+@csrf_exempt
+def AssignmentFileAPI(request,id=0):
+    if request.method == "POST":
+        assignments_data=JSONParser().parse(request)
+        assignments_data['class_field'] = id
+        assignments_data['text_content'] = None
+        assignments_serializer=AssignmentSerializer(data=assignments_data)
+        if assignments_serializer.is_valid():
+            assignments_serializer.save()
+            return JsonResponse("Thêm bài tập thành công!",safe=False)
+        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
 
 @csrf_exempt        
 def CourseAPI(request,id=0):

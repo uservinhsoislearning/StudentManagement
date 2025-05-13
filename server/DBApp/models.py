@@ -30,15 +30,11 @@ class Assignment(models.Model):
         null=True,
         validators=[FileExtensionValidator(allowed_extensions=['pdf', 'docx'])]
     )
-    day_uploaded = models.DateField(auto_now_add=True)
-    deadline = models.DateField()
+    day_uploaded = models.DateTimeField(auto_now_add=True)
+    deadline = models.DateTimeField()
 
     class Meta:
         db_table = 'assignment'
-
-    def clean(self):
-        if not self.text_content and not self.file:
-            raise ValidationError("Thiếu thông tin!")
 
 class Assignmentscore(models.Model):
     connect_id = models.AutoField(primary_key=True)  # Unique ID for the record

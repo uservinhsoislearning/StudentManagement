@@ -11,12 +11,10 @@ class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = (
-            'assignment_id',
-            'class_field',
             'text_content',
             'file',
-            'day_uploaded',
-            'deadline'
+            'deadline',
+            'class_field'
         )
 
 class AssignmentscoreSerializer(serializers.ModelSerializer):
