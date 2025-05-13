@@ -57,7 +57,7 @@ class Class(models.Model):
 
 class Classstudent(models.Model):
     connect_id = models.AutoField(primary_key=True)
-    class_field = models.OneToOneField(Class, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word. The composite primary key (class_id, student_id) found, that is not supported. The first column is selected.
+    class_field = models.ForeignKey(Class, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word. The composite primary key (class_id, student_id) found, that is not supported. The first column is selected.
     student = models.ForeignKey('Student', models.DO_NOTHING)
 
     class Meta:

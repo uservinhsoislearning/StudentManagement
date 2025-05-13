@@ -41,8 +41,8 @@ class ClassSerializer(serializers.ModelSerializer):
 
 
 class ClassstudentSerializer(serializers.ModelSerializer):
-    class_field = ClassSerializer(read_only=True)
-    student = serializers.PrimaryKeyRelatedField(read_only=True)
+    # class_field = ClassSerializer(read_only=True)
+    # student = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Classstudent

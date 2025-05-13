@@ -74,7 +74,7 @@ def teacherAPI(request,id=0):
         return JsonResponse("Xóa thầy/cô thành công!",safe=False)
 
 @csrf_exempt
-def classStudentAPI(request):
+def classStudentAPI(request, class_id=0, student_id=0):
     if request.method == 'POST':
         class_student_data=JSONParser().parse(request)
         class_student_serializer=ClassstudentSerializer(data=class_student_data)
@@ -83,10 +83,15 @@ def classStudentAPI(request):
             return JsonResponse("Thêm học sinh vào lớp dữ liệu thành công!",safe=False)
         return JsonResponse("Cần nhập id học sinh và id lớp!",safe=False)
     elif request.method == 'DELETE':
-        class_student_data=JSONParser().parse(request)
-        class_student=Classstudent.objects.get(class_id=class_student_data['class_id'],student_id=class_student_data['student_id'])
-        class_student.delete()
-        return JsonResponse("Xóa học sinh khỏi lớp thành công!",safe=False)
+        if class_id == 0 or student_id == 0:
+            return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
+
+        try:
+            class_student = Classstudent.objects.get(class_field_id=class_id, student_id=student_id)
+            class_student.delete()
+            return JsonResponse("Xóa học sinh khỏi lớp thành công!", safe=False)
+        except Classstudent.DoesNotExist:
+            return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
 @csrf_exempt
 def getStudentInClass(request, id=0):
