@@ -64,13 +64,29 @@ class Classstudent(models.Model):
         db_table = 'classstudent'
         unique_together = (('class_field', 'student'),)
 
+class Course(models.Model):
+    course_id = models.AutoField(primary_key=True)
+    course_name = models.CharField(max_length=255)
+    course_semester = models.IntegerField(blank=True, null=True)
+    course_midterm_coeff = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        default=0.4
+    )
+    course_final_coeff = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        default=0.6
+    )
+
+    class Meta:
+        db_table = 'course'
+
 class Enrollment(models.Model):
     enrollment_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Student', models.DO_NOTHING)
     class_field = models.ForeignKey(Class, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word.
     enrollment_date = models.DateField(blank=True, null=True)
     withdrawal_date = models.DateField(blank=True, null=True)
-    grade = models.CharField(max_length=5, blank=True, null=True)
+    grade = models.CharField(max_length=5, blank=True, null=True) # Score; A,B,C,D,F
 
     class Meta:
         db_table = 'enrollment'

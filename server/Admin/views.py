@@ -5,8 +5,8 @@ from django.http.response import JsonResponse
 
 # from DBApp.models import Classstudent
 # from DBApp.serializers import ClassstudentSerializer
-from DBApp.models import Assignment,Class,Teacher,Student, Classstudent
-from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer, ClassstudentSerializer
+from DBApp.models import Assignment,Class,Teacher,Student, Classstudent, Course
+from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer, ClassstudentSerializer, CourseSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -128,4 +128,29 @@ def AssignmentAPI(request, id=0):
         assignments=Assignment.objects.get(class_id=id)
         assignments.delete()
         return JsonResponse("Xóa bài tập thành công!",safe=False)
-        
+
+@csrf_exempt        
+def CourseAPI(request,id=0):
+    if request.method == 'GET':
+        courses=Course.objects.all()
+        courses_serializer = CourseSerializer(courses,many=True)
+        return JsonResponse(courses_serializer.data, safe=False)
+    elif request.method == 'POST':
+        courses_data=JSONParser().parse(request)
+        courses_serializer=TeacherSerializer(data=courses_data)
+        if courses_serializer.is_valid():
+            courses_serializer.save()
+            return JsonResponse("Thêm môn học vào cơ sở dữ liệu thành công!",safe=False)
+        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+    elif request.method == 'PUT':
+        courses_data=JSONParser().parse(request)
+        courses=Course.objects.get(course_id = courses_data['course_id'])
+        courses_serializer = TeacherSerializer(courses, data=courses_data)
+        if courses_serializer.is_valid():
+            courses_serializer.save()
+            return JsonResponse("Cập nhật thông tin môn học thành công!", safe=False)
+        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
+    elif request.method == 'DELETE':
+        courses=Course.objects.get(course_id=id)
+        courses.delete()
+        return JsonResponse("Xóa môn học thành công!",safe=False)
