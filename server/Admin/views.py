@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
+import pandas as pd
 # from DBApp.models import Classstudent
 # from DBApp.serializers import ClassstudentSerializer
 from DBApp.models import Assignment,Class,Teacher,Student, Classstudent, Course
@@ -154,3 +155,54 @@ def CourseAPI(request,id=0):
         courses=Course.objects.get(course_id=id)
         courses.delete()
         return JsonResponse("Xóa môn học thành công!",safe=False)
+
+@csrf_exempt
+def CSVUploadCourse(request):
+    if request.method == 'POST':
+        # Step 1: Check if a file was uploaded
+        csv_file = request.FILES.get('file')
+        if not csv_file:
+            return JsonResponse({'error': 'No CSV file uploaded'}, status=400)
+
+        try:
+            # Step 2: Read CSV with pandas
+            df = pd.read_csv(csv_file)
+
+            # Validate required columns exist
+            required_columns = [
+                'course_name',
+                'course_semester',
+                'class_is_active',
+                'course_midterm_coeff',
+                'course_final_coeff',
+            ]
+            if not all(col in df.columns for col in required_columns):
+                return JsonResponse({'error': f'Thiếu trường thông tin. Expected: {required_columns}'})
+
+            # Step 3: Iterate over rows and use CourseSerializer to save
+            success_count = 0
+            errors = []
+
+            for index, row in df.iterrows():
+                # Convert row to dict
+                data = row.to_dict()
+
+                # Convert "class_is_active" to Python boolean if needed
+                if isinstance(data.get('class_is_active'), str):
+                    data['class_is_active'] = data['class_is_active'].strip().lower() in ['true', '1', 'yes']
+
+                serializer = CourseSerializer(data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    success_count += 1
+                else:
+                    errors.append({'row': index + 1, 'errors': serializer.errors})
+
+            return JsonResponse({
+                'message': f'{success_count} courses imported successfully.',
+                'errors': errors,
+            })
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)})
+        
