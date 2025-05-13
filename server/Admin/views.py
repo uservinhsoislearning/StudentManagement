@@ -158,15 +158,15 @@ def CourseAPI(request,id=0):
         return JsonResponse(courses_serializer.data, safe=False)
     elif request.method == 'POST':
         courses_data=JSONParser().parse(request)
-        courses_serializer=TeacherSerializer(data=courses_data)
+        courses_serializer=CourseSerializer(data=courses_data)
         if courses_serializer.is_valid():
             courses_serializer.save()
             return JsonResponse("Thêm môn học vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         courses_data=JSONParser().parse(request)
-        courses=Course.objects.get(course_id = courses_data['course_id'])
-        courses_serializer = TeacherSerializer(courses, data=courses_data)
+        courses=Course.objects.get(course_id = id)
+        courses_serializer = CourseSerializer(courses, data=courses_data)
         if courses_serializer.is_valid():
             courses_serializer.save()
             return JsonResponse("Cập nhật thông tin môn học thành công!", safe=False)
