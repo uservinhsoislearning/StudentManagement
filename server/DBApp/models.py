@@ -32,11 +32,6 @@ class Assignment(models.Model):
     )
     day_uploaded = models.DateField(auto_now_add=True)
     deadline = models.DateField()
-    score = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
-        blank=True,
-        null=True
-    )
 
     class Meta:
         db_table = 'assignment'
@@ -45,10 +40,38 @@ class Assignment(models.Model):
         if not self.text_content and not self.file:
             raise ValidationError("Thiếu thông tin!")
 
+class Assignmentscore(models.Model):
+    connect_id = models.AutoField(primary_key=True)  # Unique ID for the record
+
+    assignment = models.ForeignKey(
+        'Assignment',
+        on_delete=models.CASCADE,
+        db_column='assignment_id'
+    )
+
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        db_column='student_id'
+    )
+
+    score = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        db_table = 'assignment_score'
+        unique_together = ('assignment', 'student')
+
 class Class(models.Model):
     class_id = models.AutoField(primary_key=True)
     class_name = models.CharField(max_length=255)
-    class_teacher = models.ForeignKey('Teacher', models.DO_NOTHING)
+    class_teacher = models.ForeignKey(
+        'Teacher', 
+        models.DO_NOTHING
+    )
     class_semester = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -57,8 +80,15 @@ class Class(models.Model):
 
 class Classstudent(models.Model):
     connect_id = models.AutoField(primary_key=True)
-    class_field = models.ForeignKey(Class, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word. The composite primary key (class_id, student_id) found, that is not supported. The first column is selected.
-    student = models.ForeignKey('Student', models.DO_NOTHING)
+    class_field = models.ForeignKey(
+        Class, 
+        models.DO_NOTHING, 
+        db_column='class_id'
+    )  # Field renamed because it was a Python reserved word. The composite primary key (class_id, student_id) found, that is not supported. The first column is selected.
+    student = models.ForeignKey(
+        'Student', 
+        models.DO_NOTHING
+    )
 
     class Meta:
         db_table = 'classstudent'
@@ -82,8 +112,15 @@ class Course(models.Model):
 
 class Enrollment(models.Model):
     enrollment_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey('Student', models.DO_NOTHING)
-    class_field = models.ForeignKey(Class, models.DO_NOTHING, db_column='class_id')  # Field renamed because it was a Python reserved word.
+    student = models.ForeignKey(
+        'Student', 
+        models.DO_NOTHING
+    )
+    class_field = models.ForeignKey(
+        Class, 
+        models.DO_NOTHING, 
+        db_column='class_id'
+    )  # Field renamed because it was a Python reserved word.
     enrollment_date = models.DateField(blank=True, null=True)
     withdrawal_date = models.DateField(blank=True, null=True)
     grade = models.CharField(max_length=5, blank=True, null=True) # Score; A,B,C,D,F
@@ -107,8 +144,16 @@ class Parent(models.Model):
         db_table = 'parent'
 
 class Score(models.Model):
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
-    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+    student = models.ForeignKey(
+        'Student', 
+        on_delete=models.CASCADE, 
+        db_column='student_id'
+    )
+    class_field = models.ForeignKey(
+        'Class', 
+        on_delete=models.CASCADE, 
+        db_column='class_id'
+    )
     score = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
         blank=True,
