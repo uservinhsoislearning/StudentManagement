@@ -97,12 +97,11 @@ def classStudentAPI(request, class_id=0, student_id=0):
 def getStudentInClass(request, id=0):
     if request.method == 'POST':
         try:
-            class_student_data=JSONParser().parse(request)
-            class_students = Classstudent.objects.get(class_id=id)
+            class_students = Classstudent.objects.filter(class_field_id=id)
             students = [cs.student for cs in class_students]
             students_serializer = StudentSerializer(students, many=True)
             return JsonResponse(students_serializer.data, safe=False)
-        except Class.DoesNotExist:
+        except Classstudent.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")
         
 @csrf_exempt
