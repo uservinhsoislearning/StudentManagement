@@ -73,23 +73,6 @@ class Class(models.Model):
     class Meta:
         db_table = 'class'
 
-
-class Classstudent(models.Model):
-    connect_id = models.AutoField(primary_key=True)
-    class_field = models.ForeignKey(
-        Class, 
-        models.DO_NOTHING, 
-        db_column='class_id'
-    )  # Field renamed because it was a Python reserved word. The composite primary key (class_id, student_id) found, that is not supported. The first column is selected.
-    student = models.ForeignKey(
-        'Student', 
-        models.DO_NOTHING
-    )
-
-    class Meta:
-        db_table = 'classstudent'
-        unique_together = (('class_field', 'student'),)
-
 class Course(models.Model):
     course_id = models.AutoField(primary_key=True)
     course_name = models.CharField(max_length=255)
@@ -106,7 +89,7 @@ class Course(models.Model):
     class Meta:
         db_table = 'course'
 
-class Enrollment(models.Model):
+class Enrollment(models.Model): #This should be fixed
     enrollment_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(
         'Student', 
@@ -117,9 +100,9 @@ class Enrollment(models.Model):
         models.DO_NOTHING, 
         db_column='class_id'
     )  # Field renamed because it was a Python reserved word.
-    enrollment_date = models.DateField(blank=True, null=True)
-    withdrawal_date = models.DateField(blank=True, null=True)
-    grade = models.CharField(max_length=5, blank=True, null=True) # Score; A,B,C,D,F
+    enrollment_date = models.DateTimeField(auto_now_add=True, null=True)
+    withdrawal_date = models.DateTimeField(blank=True, null=True)
+    grade = models.CharField(max_length=5, blank=True, null=True) # Score: A,B,C,D,F
 
     class Meta:
         db_table = 'enrollment'

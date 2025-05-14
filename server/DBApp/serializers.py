@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Classstudent, Course, Assignmentscore
+from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore
 # from .models import Classstudent
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -45,18 +45,6 @@ class ClassSerializer(serializers.ModelSerializer):
                 'class_teacher',
                 'class_semester')
 
-
-class ClassstudentSerializer(serializers.ModelSerializer):
-    # class_field = ClassSerializer(read_only=True)
-    # student = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    class Meta:
-        model = Classstudent
-        fields = (
-            'class_field',
-            'student'
-        )
-
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
@@ -74,12 +62,14 @@ class StudentSerializer(serializers.ModelSerializer):
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
-    class_field = ClassSerializer(read_only=True)
-    student = StudentSerializer(read_only=True)
-
     class Meta:
         model = Enrollment
-        fields = '__all__'
+        fields = (
+            'class_field',
+            'student',
+            'withdrawal_date',
+            'grade'
+        )
 
 
 class ParentSerializer(serializers.ModelSerializer):
