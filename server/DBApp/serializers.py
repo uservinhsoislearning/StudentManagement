@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore
+from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore, Work
 # from .models import Classstudent
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -85,3 +85,14 @@ class StudentparentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Studentparent
         fields = '__all__'
+
+class WorkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Work
+        fields = (
+            'assignment',
+            'student',
+            'text_content',
+            'file',
+            'score'
+        )

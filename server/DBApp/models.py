@@ -14,6 +14,24 @@ class Admin(models.Model):
     class Meta:
         db_table = 'admin'
 
+class AttendanceSession(models.Model):
+    session_id = models.AutoField(primary_key=True)
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+    date = models.DateField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'attendance_session'
+
+class AttendanceRecord(models.Model):
+    record_id = models.AutoField(primary_key=True)
+    session = models.ForeignKey('AttendanceSession', on_delete=models.CASCADE, db_column='session_id')
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+    is_present = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'attendance_record'
+        unique_together = ('session', 'student')  # One record per student per session
+
 def assignment_upload_path(instance, filename):
     return os.path.join('assignments', f"class_{instance.class_field.class_id}", filename)
 class Assignment(models.Model):
@@ -122,26 +140,23 @@ class Parent(models.Model):
     class Meta:
         db_table = 'parent'
 
-class Score(models.Model):
-    student = models.ForeignKey(
-        'Student', 
-        on_delete=models.CASCADE, 
-        db_column='student_id'
+class Report(models.Model):
+    report_id = models.AutoField(primary_key=True)
+
+    type_of_bug = models.TextField(
+        max_length=1000,
+        blank=True,
+        null=True
     )
-    class_field = models.ForeignKey(
-        'Class', 
-        on_delete=models.CASCADE, 
-        db_column='class_id'
-    )
-    score = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+
+    description = models.TextField(
+        max_length=10000,
         blank=True,
         null=True
     )
 
     class Meta:
-        db_table = 'score'
-        unique_together = ('student', 'class_field')  # Prevent duplicate score entries per class/student
+        db_table = 'report'
 
 class Student(models.Model):
     student_id = models.AutoField(primary_key=True)
@@ -179,3 +194,36 @@ class Teacher(models.Model):
 
     class Meta:
         db_table = 'teacher'
+
+def work_upload_path(instance, filename):
+    return os.path.join('works', f"assignment_{instance.assignment.assignment_id}", f"student_{instance.student.student_id}", filename)
+
+class Work(models.Model):
+    work_id = models.AutoField(primary_key=True)
+    assignment = models.ForeignKey('Assignment', on_delete=models.CASCADE, db_column='assignment_id')
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+
+    text_content = models.TextField(
+        max_length=10000,
+        blank=True,
+        null=True
+    )
+
+    file = models.FileField(
+        upload_to=work_upload_path,
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'docx'])]
+    )
+
+    day_uploaded = models.DateTimeField(auto_now_add=True)
+
+    score = models.FloatField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
+    )
+
+    class Meta:
+        db_table = 'work'
+        unique_together = ('assignment', 'student')  # One submission per student per assignment
