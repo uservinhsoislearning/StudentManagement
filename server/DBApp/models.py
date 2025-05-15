@@ -14,24 +14,6 @@ class Admin(models.Model):
     class Meta:
         db_table = 'admin'
 
-class AttendanceSession(models.Model):
-    session_id = models.AutoField(primary_key=True)
-    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
-    date = models.DateField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'attendance_session'
-
-class AttendanceRecord(models.Model):
-    record_id = models.AutoField(primary_key=True)
-    session = models.ForeignKey('AttendanceSession', on_delete=models.CASCADE, db_column='session_id')
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
-    is_present = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'attendance_record'
-        unique_together = ('session', 'student')  # One record per student per session
-
 def assignment_upload_path(instance, filename):
     return os.path.join('assignments', f"class_{instance.class_field.class_id}", filename)
 class Assignment(models.Model):
