@@ -102,8 +102,11 @@ class Enrollment(models.Model): #This should be fixed
     )  # Field renamed because it was a Python reserved word.
     enrollment_date = models.DateTimeField(auto_now_add=True, null=True)
     withdrawal_date = models.DateTimeField(blank=True, null=True)
-    grade = models.CharField(max_length=5, blank=True, null=True) # Score: A,B,C,D,F
-
+    grade = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
     class Meta:
         db_table = 'enrollment'
 
