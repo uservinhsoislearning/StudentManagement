@@ -4,8 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from GiaoVienApp.models import AttendanceRecord, AttendanceSession
-from GiaoVienApp.serializers import AttendanceRecordSerializer, AttendanceSessionSerializer
+from GiaoVienApp.models import AttendanceSession, AttendanceRecord
+from GiaoVienApp.serializers import AttendanceSessionSerializer, AttendanceRecordSerializer
 
 from DBApp.models import Enrollment
 from DBApp.serializers import EnrollmentSerializer
@@ -43,9 +43,9 @@ def AttendanceRecordAPI(request, class_id=0):
         # Create new attendance session
         session = AttendanceSession.objects.create(class_field_id=class_id)
         # Get all students in this class
-        students = Enrollment.objects.filter(class_field=class_id)
+        enrollment = Enrollment.objects.filter(class_field=class_id)
         # Create attendance record for each student
-        for student in students:
+        for student in enrollment:
             AttendanceRecord.objects.create(session=session, student=student)
         return JsonResponse({"message": "Attendance records created", "session_id": session.session_id}, safe=False)
     

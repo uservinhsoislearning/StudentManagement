@@ -12,6 +12,7 @@ class AttendanceSession(models.Model):
 class AttendanceRecord(models.Model):
     record_id = models.AutoField(primary_key=True)
     session = models.ForeignKey('AttendanceSession', on_delete=models.CASCADE, db_column='session_id')
+    enrollment = models.ForeignKey('DBApp.Enrollment', on_delete=models.CASCADE, db_column='enrollment_id')
     student = models.ForeignKey('DBApp.Student', on_delete=models.CASCADE, db_column='student_id')
     is_present = models.BooleanField(default=False)
 

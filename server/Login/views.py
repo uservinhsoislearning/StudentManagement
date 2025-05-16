@@ -21,7 +21,7 @@ def userLoginAPI(request):
         try:
             user = Userlogin.objects.get(useremail=user_data['useremail'])
             if check_password(user_data['password'], user.password):
-                return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username}) #Dang nhap thanh cong
+                return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username, "usertype": user.usertype}) #Dang nhap thanh cong
             else:
                 return JsonResponse("Mật khẩu không đúng!",safe=False) #Mat khau sai
         except Userlogin.DoesNotExist:

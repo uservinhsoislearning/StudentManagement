@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AttendanceRecord, AttendanceSession
+from .models import AttendanceSession, AttendanceRecord
 from DBApp.serializers import StudentSerializer
 
 class AttendanceSessionSerializer(serializers.ModelSerializer):
