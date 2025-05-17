@@ -67,9 +67,20 @@ class EnrollmentSerializer(serializers.ModelSerializer):
             'class_field',
             'student',
             'withdrawal_date',
-            'grade'
+            'grade',
+            'midterm',
+            'final'
         )
 
+class EnrollmentGradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = (
+            'student',
+            'midterm',
+            'final',
+            'grade'
+        )
 
 class ParentSerializer(serializers.ModelSerializer):
     class Meta:

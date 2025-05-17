@@ -69,6 +69,13 @@ class Class(models.Model):
         models.DO_NOTHING
     )
     class_semester = models.IntegerField(blank=True, null=True)
+    # course = models.ForeignKey(
+    #     'Course',
+    #     on_delete=models.CASCADE,
+    #     related_name='classes'
+    # )
+    # start_time = models.TimeField() #thoi khoa bieu
+    # end_time = models.TimeField()
 
     class Meta:
         db_table = 'class'
@@ -103,6 +110,16 @@ class Enrollment(models.Model): #This should be fixed
     enrollment_date = models.DateTimeField(auto_now_add=True, null=True)
     withdrawal_date = models.DateTimeField(blank=True, null=True)
     grade = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
+    midterm = models.FloatField(
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
+        blank=True,
+        null=True
+    )
+    final = models.FloatField(
         validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
         blank=True,
         null=True
