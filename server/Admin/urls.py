@@ -25,5 +25,11 @@ urlpatterns = [
     re_path(r'^api/course-classes$', views.CourseAPI),
     re_path(r'^api/course-classes/([0-9]+)$', views.CourseAPI),
             
-    re_path(r'^api/course-classes/import', views.CSVUploadCourse)
+    re_path(r'^api/course-classes/import$', views.CSVUploadCourse),
+
+    re_path(r'^api/reports$', views.ReportAPI),
+
+    re_path(r'^api/semesters$', views.SemesterAPI),
+    re_path(r'^api/semesters/([0-9]+)$', views.SemesterAPI),
+    re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI)
 ]

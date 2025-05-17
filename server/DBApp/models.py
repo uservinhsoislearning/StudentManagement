@@ -125,6 +125,7 @@ class Parent(models.Model):
     class Meta:
         db_table = 'parent'
 
+
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
 
@@ -140,8 +141,38 @@ class Report(models.Model):
         null=True
     )
 
+    sender = models.ForeignKey(
+        'Login.Userlogin',
+        on_delete=models.SET_NULL,
+        db_column='sender_id',
+        null=True,
+        blank=True,
+        related_name='reports'
+    )
+
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Resolved', 'Resolved'),
+        ('Rejected', 'Rejected'),
+    ]
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )
+
     class Meta:
         db_table = 'report'
+
+class Semester(models.Model):
+    semester_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    startDate = models.DateField()
+    endDate = models.DateField()
+    isActive = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = 'semester'
 
 class Student(models.Model):
     student_id = models.AutoField(primary_key=True)

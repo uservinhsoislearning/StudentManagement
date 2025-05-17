@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore, Work
+from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore, Work, Report, Semester
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,6 +76,25 @@ class ParentSerializer(serializers.ModelSerializer):
         model = Parent
         fields = '__all__'
 
+class ReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = (
+            'type_of_bug',
+            'description',
+            'sender',
+            'status'
+        )
+
+class SemesterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semester
+        fields = (
+            'name',
+            'startDate',
+            'endDate',
+            'isActive'
+        )
 
 class StudentparentSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)

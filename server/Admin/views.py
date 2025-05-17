@@ -4,10 +4,10 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 import pandas as pd
-# from DBApp.models import Classstudent
-# from DBApp.serializers import ClassstudentSerializer
-from DBApp.models import Assignment,Class,Teacher,Student, Course, Enrollment
-from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer, CourseSerializer, EnrollmentSerializer
+from DBApp.models import Semester
+from DBApp.serializers import SemesterSerializer
+from DBApp.models import Assignment,Class,Teacher,Student, Course, Enrollment, Report
+from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer, CourseSerializer, EnrollmentSerializer, ReportSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -228,3 +228,55 @@ def CSVUploadCourse(request):
         except Exception as e:
             return JsonResponse({'error': str(e)})
         
+@csrf_exempt
+def ReportAPI(request, user_id=0): #This post method is currently not available (but it still exists to insert values into the tables)
+    if request.method == 'GET':
+        reports = Report.objects.filter(sender=user_id) if user_id != 0 else Report.objects.all()
+        serializer = ReportSerializer(reports, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'POST':
+        reports_data = JSONParser().parse(request)
+        # reports_data['sender'] = user.user_id  # Inject sender into the data
+        serializer = ReportSerializer(data=reports_data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse({"message": "Report submitted successfully"}, status=201)
+        return JsonResponse(serializer.errors, status=400)
+    
+@csrf_exempt
+def SemesterAPI(request, sem_id=0):
+    if request.method == 'GET':
+        semesters = Semester.objects.all()
+        semesters_serializer = SemesterSerializer(semesters, many=True)
+        return JsonResponse(semesters_serializer.data, safe=False)
+    elif request.method == 'POST':
+        semesters_data = JSONParser().parse(request)
+        semesters_serializer = SemesterSerializer(data=semesters_data)
+        if semesters_serializer.is_valid():
+            semesters_serializer.save()
+            return JsonResponse({"message": "Semester created successfully"}, status=201)
+        return JsonResponse(semesters_serializer.errors, status=400)
+    elif request.method == 'PUT':
+        semesters_data = JSONParser().parse(request)
+        semesters=Semester.objects.get(semester_id=sem_id)
+        semesters_serializer = SemesterSerializer(semesters, data=semesters_data)
+        if semesters_serializer.is_valid():
+            semesters_serializer.save()
+            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
+        return JsonResponse(semesters_serializer.errors, status=400)
+    elif request.method == 'DELETE':
+        semesters=Semester.objects.get(semester_id=sem_id)
+        semesters.delete()
+        return JsonResponse({"message": "Semester deleted successfully"}, status=204)
+
+@csrf_exempt
+def SemesterPatchAPI(request, sem_id=0):
+    if request.method == 'PATCH':
+        try:
+            semesters = Semester.objects.get(semester_id=sem_id)
+            semesters.isActive = not semesters.isActive
+            semesters.save()
+            return JsonResponse("Cập nhật trạng thái thành công!", safe=False)
+        except Semester.DoesNotExist:
+            return JsonResponse({"error": "Semester not found"}, status=404)
+    
