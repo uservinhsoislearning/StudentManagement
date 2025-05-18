@@ -48,7 +48,8 @@ def AttendanceRecordAPI(request, class_id=0):
         for student in enrollment:
             AttendanceRecord.objects.create(session=session, student=student)
         return JsonResponse({"message": "Attendance records created", "session_id": session.session_id}, safe=False)
-    
+
+@csrf_exempt
 def MarkStudentPresent(request, session_id, student_id):
     if request.method == 'PUT':
         try:

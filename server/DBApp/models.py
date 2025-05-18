@@ -69,13 +69,13 @@ class Class(models.Model):
         models.DO_NOTHING
     )
     class_semester = models.IntegerField(blank=True, null=True)
-    # course = models.ForeignKey(
-    #     'Course',
-    #     on_delete=models.CASCADE,
-    #     related_name='classes'
-    # )
-    # start_time = models.TimeField() #thoi khoa bieu
-    # end_time = models.TimeField()
+    course = models.ForeignKey(
+        'Course',
+        on_delete=models.CASCADE,
+        related_name='classes'
+    )
+    start_time = models.TimeField() #thoi khoa bieu
+    end_time = models.TimeField()
 
     class Meta:
         db_table = 'class'
@@ -208,25 +208,51 @@ class Student(models.Model):
 
 
 class Studentparent(models.Model):
-    student = models.OneToOneField(Student, models.DO_NOTHING, primary_key=True)  # The composite primary key (student_id, parent_id) found, that is not supported. The first column is selected.
-    parent = models.ForeignKey(Parent, models.DO_NOTHING)
+    connect_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.CASCADE,
+        db_column='student_id'
+    )
+    parent = models.ForeignKey(
+        'Parent',
+        on_delete=models.CASCADE,
+        db_column='parent_id'
+    )
     relationship_to_student = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         db_table = 'studentparent'
         unique_together = (('student', 'parent'),)
 
-
 class Teacher(models.Model):
     teacher_id = models.AutoField(primary_key=True)
     teacher_name = models.CharField(max_length=255)
     teacher_gender = models.CharField(max_length=50, blank=True, null=True)
     teacher_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    teacher_classes = models.CharField(max_length=255, blank=True, null=True)
     teacher_profession = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         db_table = 'teacher'
+
+class CourseTeacher(models.Model):
+    connect_id = models.AutoField(primary_key=True)
+
+    course = models.ForeignKey(
+        'Course',
+        on_delete=models.CASCADE,
+        db_column='course_id'
+    )
+
+    teacher = models.ForeignKey(
+        'Teacher',
+        on_delete=models.CASCADE,
+        db_column='teacher_id'
+    )
+
+    class Meta:
+        db_table = 'course_teacher'
+        unique_together = ('course', 'teacher')
 
 def work_upload_path(instance, filename):
     return os.path.join('works', f"assignment_{instance.assignment.assignment_id}", f"student_{instance.student.student_id}", filename)

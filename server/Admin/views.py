@@ -4,10 +4,10 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 import pandas as pd
-from DBApp.models import Semester
-from DBApp.serializers import SemesterSerializer
-from DBApp.models import Assignment,Class,Teacher,Student, Course, Enrollment, Report
-from DBApp.serializers import AssignmentSerializer,ClassSerializer,TeacherSerializer,StudentSerializer, CourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, ReportSerializer, ClassWithIDSerializer
+from DBApp.models import Class, Enrollment, Assignment
+from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, AssignmentSerializer
+from DBApp.models import Teacher,Student, Course, Report, Semester
+from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -29,11 +29,11 @@ def classAPI(request,id=0):
         return JsonResponse(classes_serializer.data, safe=False)
     elif request.method == 'POST':
         classes_data=JSONParser().parse(request)
-        classes_serializer=ClassSerializer(data=classes_data)
+        classes_serializer=ClassWithCourseSerializer(data=classes_data)
         if classes_serializer.is_valid():
             classes_serializer.save()
             return JsonResponse("Thêm lớp vào cơ sở dữ liệu thành công!",safe=False)
-        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+        return JsonResponse(classes_serializer.errors,safe=False)
     elif request.method == 'PUT':
         classes_data=JSONParser().parse(request)
         classes=Class.objects.get(class_id = classes_data['class_id'])

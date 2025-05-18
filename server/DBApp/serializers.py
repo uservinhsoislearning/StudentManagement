@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Class, Enrollment, Parent, Student, Studentparent, Teacher, Assignment, Course, Assignmentscore, Work, Report, Semester
+from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,6 +34,20 @@ class TeacherSerializer(serializers.ModelSerializer):
                   'teacher_classes',
                   'teacher_profession')
 
+class ClassWithCourseSerializer(serializers.ModelSerializer):
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
+
+    class Meta:
+        model = Class
+        fields = (
+            'class_name',
+            'class_teacher',
+            'class_semester',
+            'course',
+            'start_time',
+            'end_time'
+        )
+
 class ClassWithIDSerializer(serializers.ModelSerializer):
     class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
 
@@ -43,16 +57,34 @@ class ClassWithIDSerializer(serializers.ModelSerializer):
             'class_id',
             'class_name',
             'class_teacher',
-            'class_semester')
+            'class_semester',
+            'start_time',
+            'end_time'
+        )
 
 class ClassSerializer(serializers.ModelSerializer):
     class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
 
     class Meta:
         model = Class
-        fields = ('class_name',
-                'class_teacher',
-                'class_semester')
+        fields = (
+            'class_name',
+            'class_teacher',
+            'class_semester',
+            'start_time',
+            'end_time'
+        )
+
+class CourseWithIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = (
+            'course_id',
+            'course_name', 
+            'course_semester',
+            'course_midterm_coeff',
+            'course_final_coeff'
+        )
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
