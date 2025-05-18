@@ -34,6 +34,16 @@ class TeacherSerializer(serializers.ModelSerializer):
                   'teacher_classes',
                   'teacher_profession')
 
+class ClassWithIDSerializer(serializers.ModelSerializer):
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
+
+    class Meta:
+        model = Class
+        fields = (
+            'class_id',
+            'class_name',
+            'class_teacher',
+            'class_semester')
 
 class ClassSerializer(serializers.ModelSerializer):
     class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
