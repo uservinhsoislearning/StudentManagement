@@ -124,6 +124,17 @@ class EnrollmentGradeSerializer(serializers.ModelSerializer):
             'grade'
         )
 
+class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = (
+            'student',
+            'class_field',
+            'midterm',
+            'final',
+            'grade'
+        )
+
 class ParentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent

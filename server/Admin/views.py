@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 
 import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent
-from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
+from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester
 from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer
 # Create your views here.
@@ -130,6 +130,13 @@ def getStudentInClass(request, id=0):
             return JsonResponse(students_serializer.data, safe=False)
         except Enrollment.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")
+        
+@csrf_exempt
+def getGradeStudent(request, sid=0):
+    if request.method == 'GET':
+        enrollment=Enrollment.objects.filter(student = sid)
+        enrollment_serializer = EnrollmentGradeSubjectSerializer(enrollment,many=True)
+        return JsonResponse(enrollment_serializer.data, safe=False)
         
 @csrf_exempt
 def AssignmentAPI(request, id=0):

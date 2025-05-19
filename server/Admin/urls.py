@@ -35,5 +35,7 @@ urlpatterns = [
     re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI),
 
     re_path(r'^api/parents', views.ParentAPI),
-    re_path(r'^api/parents/(?P<pid>\d+)', views.ParentAPI)
+    re_path(r'^api/parents/(?P<pid>\d+)', views.ParentAPI),
+
+    re_path(r'api/student/(?P<sid>\d+)/grades', views.getGradeStudent)
 ]
