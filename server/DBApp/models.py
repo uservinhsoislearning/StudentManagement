@@ -130,14 +130,11 @@ class Enrollment(models.Model): #This should be fixed
 
 class Parent(models.Model):
     parent_id = models.AutoField(primary_key=True)
-    parent_firstname = models.CharField(max_length=255)
-    parent_lastname = models.CharField(max_length=255)
+    parent_name = models.CharField(max_length=255)
     parent_gender = models.CharField(max_length=50, blank=True, null=True)
     parent_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
     parent_phone_number = models.CharField(max_length=20, blank=True, null=True)
-    parent_address = models.CharField(max_length=255, blank=True, null=True)
     parent_occupation = models.CharField(max_length=255, blank=True, null=True)
-    parent_relationship_to_student = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         db_table = 'parent'

@@ -124,10 +124,21 @@ class EnrollmentGradeSerializer(serializers.ModelSerializer):
             'grade'
         )
 
-class ParentSerializer(serializers.ModelSerializer):
+class ParentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Parent
         fields = '__all__'
+
+class ParentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parent
+        fields = (
+            'parent_name',
+            'parent_gender',
+            'parent_email',
+            'parent_phone_number',
+            'parent_occupation'
+        )
 
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:

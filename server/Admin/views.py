@@ -4,8 +4,8 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 import pandas as pd
-from DBApp.models import Class, Enrollment, Assignment
-from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, AssignmentSerializer
+from DBApp.models import Class, Enrollment, Assignment, Parent
+from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester
 from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer
 # Create your views here.
@@ -305,3 +305,28 @@ def SemesterPatchAPI(request, sem_id=0):
         except Semester.DoesNotExist:
             return JsonResponse({"error": "Semester not found"}, status=404)
     
+@csrf_exempt
+def ParentAPI(request, pid=0):
+    if request.method == 'GET':
+        parents=Parent.objects.all()
+        parents_serializer = ParentWithIDSerializer(parents,many=True)
+        return JsonResponse(parents_serializer.data, safe=False)
+    elif request.method == 'POST':
+        parents_data=JSONParser().parse(request)
+        parents_serializer=ParentSerializer(data=parents_data)
+        if parents_serializer.is_valid():
+            parents_serializer.save()
+            return JsonResponse("Thêm bố/mẹ vào cơ sở dữ liệu thành công!",safe=False)
+        return JsonResponse(parents_serializer.errors,safe=False)
+    elif request.method == 'PUT':
+        parents_data=JSONParser().parse(request)
+        parents=Parent.objects.get(parent_id = parents_data['parent_id'])
+        parents_serializer = ParentSerializer(parents, data=parents_data)
+        if parents_serializer.is_valid():
+            parents_serializer.save()
+            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
+        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
+    elif request.method == 'DELETE':
+        parents=Parent.objects.get(parent_id=pid)
+        parents.delete()
+        return JsonResponse("Xóa bố/mẹ thành công!",safe=False)

@@ -32,5 +32,8 @@ urlpatterns = [
 
     re_path(r'^api/semesters$', views.SemesterAPI),
     re_path(r'^api/semesters/([0-9]+)$', views.SemesterAPI),
-    re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI)
+    re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI),
+
+    re_path(r'^api/parents', views.ParentAPI),
+    re_path(r'^api/parents/(?P<pid>\d+)', views.ParentAPI)
 ]
