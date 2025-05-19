@@ -347,3 +347,20 @@ def ClassTimetableAPI(request, sid=0):
 
         serializer = ClassWithTimetableSerializer(classes, many=True)
         return JsonResponse(serializer.data, safe=False)
+    
+@csrf_exempt
+def getSummaryAdmin(request):
+    if request.method == 'GET':
+        total_students = Student.objects.count()
+        total_teachers = Teacher.objects.count()
+        total_parents = Parent.objects.count()
+        reports_pending = Report.objects.filter(status='Pending').count()
+
+        dashboard = {
+            "totalStudents": total_students,
+            "totalTeachers": total_teachers,
+            "totalParents": total_parents,
+            "reportsPending": reports_pending
+        }
+
+        return JsonResponse(dashboard, safe=False)
