@@ -1,18 +1,11 @@
 from rest_framework import serializers
-from .models import AttendanceSession, AttendanceRecord
-from DBApp.serializers import StudentSerializer
+from .models import Attendance
 
-class AttendanceSessionSerializer(serializers.ModelSerializer):
+class AttendanceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AttendanceSession
-        fields = '__all__'
-
-class AttendanceRecordSerializer(serializers.ModelSerializer):
-    student = StudentSerializer(read_only=True)  # Nested student info (optional)
-
-    class Meta:
-        model = AttendanceRecord
+        model = Attendance
         fields = (
+            'class_field',
             'student',
             'is_present'
         )

@@ -32,7 +32,8 @@ class Assignment(models.Model):
     )
     day_uploaded = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField()
-
+    is_exam = models.BooleanField(default=False)
+    
     class Meta:
         db_table = 'assignment'
 

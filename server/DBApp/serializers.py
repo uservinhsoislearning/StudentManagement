@@ -13,7 +13,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
             'text_content',
             'file',
             'deadline',
-            'class_field'
+            'class_field',
+            'is_exam'
         )
 
 class AssignmentscoreSerializer(serializers.ModelSerializer):

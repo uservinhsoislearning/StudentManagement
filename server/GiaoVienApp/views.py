@@ -4,16 +4,18 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from GiaoVienApp.models import AttendanceSession, AttendanceRecord
-from GiaoVienApp.serializers import AttendanceSessionSerializer, AttendanceRecordSerializer
+from django.utils import timezone
 
-from DBApp.models import Enrollment
+from GiaoVienApp.models import Attendance
+from GiaoVienApp.serializers import AttendanceSerializer
+
+from DBApp.models import Enrollment, Class
 from DBApp.serializers import EnrollmentSerializer
 
 @csrf_exempt
 def EnrollmentScoreAPI(request, class_id=0, student_id=0):
     if request.method == "GET":
-        enrollment=Enrollment.objects.filter(class_field = id)
+        enrollment=Enrollment.objects.filter(class_field = class_id)
         enrollment_serializer = EnrollmentSerializer(enrollment,many=True)
         return JsonResponse(enrollment_serializer.data, safe=False)
     elif request.method == 'PUT':
@@ -34,28 +36,42 @@ def EnrollmentScoreAPI(request, class_id=0, student_id=0):
             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
 @csrf_exempt
-def AttendanceRecordAPI(request, class_id=0):
+def AttendanceRecordAPI(request, cid=0, sid=0):
     if request.method == 'GET':
-        attendance=AttendanceRecord.objects.all()
-        attendance_serializer = AttendanceRecordSerializer(attendance,many=True)
+        attendance=Attendance.objects.filter(class_field_id=cid,timestamp__date=timezone.now().date())
+        attendance_serializer=AttendanceSerializer(attendance,many=True)
         return JsonResponse(attendance_serializer.data, safe=False)
     elif request.method == 'POST':
-        # Create new attendance session
-        session = AttendanceSession.objects.create(class_field_id=class_id)
-        # Get all students in this class
-        enrollment = Enrollment.objects.filter(class_field=class_id)
-        # Create attendance record for each student
-        for student in enrollment:
-            AttendanceRecord.objects.create(session=session, student=student)
-        return JsonResponse({"message": "Attendance records created", "session_id": session.session_id}, safe=False)
-
-@csrf_exempt
-def MarkStudentPresent(request, session_id, student_id):
-    if request.method == 'PUT':
         try:
-            record = AttendanceRecord.objects.get(session_id=session_id, student_id=student_id)
-            record.is_present = True
+            # Validate class existence
+            if not Class.objects.filter(class_id=cid).exists():
+                return JsonResponse({"error": "Lớp không tồn tại!"}, status=404)
+
+            # Get all enrollments for this class
+            enrollments = Enrollment.objects.filter(class_field_id=cid)
+
+            if not enrollments.exists():
+                return JsonResponse({"error": "Không có học sinh nào trong lớp này!"}, status=404)
+
+            # Create attendance records for each student
+            created_records = []
+            for enrollment in enrollments:
+                attendance = Attendance.objects.create(
+                    class_field_id=cid,
+                    student=enrollment.student_id
+                )
+                created_records.append(attendance)
+
+            serializer = AttendanceSerializer(created_records, many=True)
+            return JsonResponse({"message": "Tạo điểm danh thành công!", "data": serializer.data}, safe=False)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    elif request.method == 'PATCH':
+        try:
+            record = Attendance.objects.get(student=sid, class_field_id=cid, timestamp__date=timezone.now().date())
+            record.is_present = not record.is_present
             record.save()
-            return JsonResponse({"message": "Student marked as present."})
-        except AttendanceRecord.DoesNotExist:
+            return JsonResponse({"message": "Student marked as present."}) if record.is_present == True else JsonResponse({"message": "Student marked as NOT present."})
+        except Attendance.DoesNotExist:
             return JsonResponse({"error": "Attendance record not found."}, status=404)
