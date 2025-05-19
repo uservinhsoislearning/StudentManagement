@@ -7,7 +7,7 @@ import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester
-from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer
+from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -337,3 +337,13 @@ def ParentAPI(request, pid=0):
         parents=Parent.objects.get(parent_id=pid)
         parents.delete()
         return JsonResponse("Xóa bố/mẹ thành công!",safe=False)
+    
+
+@csrf_exempt
+def ClassTimetableAPI(request, sid=0):
+    if request.method == 'GET':
+        class_ids = Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
+        classes = Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
+
+        serializer = ClassWithTimetableSerializer(classes, many=True)
+        return JsonResponse(serializer.data, safe=False)

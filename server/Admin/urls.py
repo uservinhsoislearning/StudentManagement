@@ -37,5 +37,7 @@ urlpatterns = [
     re_path(r'^api/parents', views.ParentAPI),
     re_path(r'^api/parents/(?P<pid>\d+)', views.ParentAPI),
 
-    re_path(r'api/student/(?P<sid>\d+)/grades', views.getGradeStudent)
+    re_path(r'api/student/(?P<sid>\d+)/grades', views.getGradeStudent),
+
+    re_path(r'api/student/(?P<sid>\d+)/schedule', views.ClassTimetableAPI)
 ]

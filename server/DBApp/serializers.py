@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work
+from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work, ClassTimetable
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,6 +74,22 @@ class ClassSerializer(serializers.ModelSerializer):
             'start_time',
             'end_time'
         )
+
+class ClassTimetableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassTimetable
+        fields = (
+            'day_of_week',
+            'start_time',
+            'end_time'
+        )
+
+class ClassWithTimetableSerializer(serializers.ModelSerializer):
+    timetables = ClassTimetableSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Class
+        fields = ('class_id', 'class_name', 'timetables')
 
 class CourseWithIDSerializer(serializers.ModelSerializer):
     class Meta:

@@ -74,11 +74,36 @@ class Class(models.Model):
         on_delete=models.CASCADE,
         related_name='classes'
     )
-    start_time = models.TimeField() #thoi khoa bieu
-    end_time = models.TimeField()
 
     class Meta:
         db_table = 'class'
+
+class ClassTimetable(models.Model):
+    DAY_CHOICES = [
+        ('MON', 'Monday'),
+        ('TUE', 'Tuesday'),
+        ('WED', 'Wednesday'),
+        ('THU', 'Thursday'),
+        ('FRI', 'Friday'),
+        ('SAT', 'Saturday'),
+        ('SUN', 'Sunday'),
+    ]
+
+    timetable_id = models.AutoField(primary_key=True)
+    class_field = models.ForeignKey(
+        'Class',
+        on_delete=models.CASCADE,
+        related_name='timetables'
+    )
+    day_of_week = models.CharField(max_length=3, choices=DAY_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    class Meta:
+        db_table = 'class_timetable'
+
 
 class Course(models.Model):
     course_id = models.AutoField(primary_key=True)
