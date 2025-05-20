@@ -26,14 +26,28 @@ class AssignmentscoreSerializer(serializers.ModelSerializer):
             'score'
         )
 
+class TeacherWithIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Teacher
+        fields = (
+            'teacher_id',
+            'teacher_name',
+            'teacher_gender',
+            'teacher_email',
+            'teacher_classes',
+            'teacher_profession'
+        )
+
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
-        fields = ('teacher_name',
-                  'teacher_gender',
-                  'teacher_email',
-                  'teacher_classes',
-                  'teacher_profession')
+        fields = (
+            'teacher_name',
+            'teacher_gender',
+            'teacher_email',
+            'teacher_classes',
+            'teacher_profession'
+        )
 
 class ClassWithCourseSerializer(serializers.ModelSerializer):
     class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization

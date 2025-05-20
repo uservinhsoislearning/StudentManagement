@@ -7,7 +7,7 @@ import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester
-from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer
+from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer
 # Create your views here.
 
 @csrf_exempt
@@ -51,7 +51,7 @@ def classAPI(request,id=0):
 def teacherAPI(request,id=0):
     if request.method == 'GET':
         teachers=Teacher.objects.all()
-        teachers_serializer = TeacherSerializer(teachers,many=True)
+        teachers_serializer = TeacherWithIDSerializer(teachers,many=True)
         return JsonResponse(teachers_serializer.data, safe=False)
     elif request.method == 'POST':
         teachers_data=JSONParser().parse(request)
