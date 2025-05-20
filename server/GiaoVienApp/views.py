@@ -5,12 +5,15 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 from django.utils import timezone
+from django.core.mail import send_mail
 
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
 
-from DBApp.models import Enrollment, Class
+from DBApp.models import Enrollment, Class, Student, Studentparent, Parent
 from DBApp.serializers import EnrollmentSerializer
+
+import server.settings as settings
 
 @csrf_exempt
 def EnrollmentScoreAPI(request, class_id=0, student_id=0):
@@ -75,3 +78,44 @@ def AttendanceRecordAPI(request, cid=0, sid=0):
             return JsonResponse({"message": "Student marked as present."}) if record.is_present == True else JsonResponse({"message": "Student marked as NOT present."})
         except Attendance.DoesNotExist:
             return JsonResponse({"error": "Attendance record not found."}, status=404)
+        
+@csrf_exempt
+def sendAttendance(request, cid=0):
+    if request.method == 'POST':
+        try:
+            today = timezone.now().date()
+
+            # Get today's attendance records for the class where students are absent
+            absent_records = Attendance.objects.filter(
+                class_field_id=cid,
+                timestamp__date=today,
+                is_present=False
+            )
+
+            if not absent_records.exists():
+                return JsonResponse("Không có học sinh nào vắng hôm nay!", safe=False)
+
+            emails_sent = []
+
+            for record in absent_records:
+                try:
+                    sid = record.student
+                    student = Student.objects.get(student_id=sid)
+                    dummy = Studentparent.objects.filter(student=sid)
+                    class_data = Class.objects.get(class_id=cid)
+                    for dum in dummy:
+                        p = dum.parent
+                        print("Reached!")
+                        subject = "Thông báo vắng mặt"
+                        message = f"Học sinh {student.student_name} đã vắng mặt buổi học hôm nay ({today}), lớp {class_data.class_name}."
+                        from_email = settings.EMAIL_HOST_USER
+                        to_email =  p.parent_email
+                        emails_sent.append(p.parent_email)
+                        send_mail(subject, message, from_email, to_email)
+                except Exception as e:
+                    continue  # skip if any lookup fails
+
+            return JsonResponse({"message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!", "recipients": emails_sent})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
