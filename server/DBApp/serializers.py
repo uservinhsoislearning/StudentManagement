@@ -34,7 +34,6 @@ class TeacherWithIDSerializer(serializers.ModelSerializer):
             'teacher_name',
             'teacher_gender',
             'teacher_email',
-            'teacher_classes',
             'teacher_profession'
         )
 
@@ -45,7 +44,6 @@ class TeacherSerializer(serializers.ModelSerializer):
             'teacher_name',
             'teacher_gender',
             'teacher_email',
-            'teacher_classes',
             'teacher_profession'
         )
 
@@ -127,10 +125,25 @@ class CourseSerializer(serializers.ModelSerializer):
             'course_final_coeff'
         )
 
-class StudentSerializer(serializers.ModelSerializer):
+class StudentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = '__all__'
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = (
+            'student_name',
+            'student_dob',
+            'student_gender',
+            'student_email',
+            'student_graduating_class',
+            'student_phone_number',
+            'student_specialization',
+            'student_is_active',
+            'student_school'
+        )
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
@@ -203,12 +216,13 @@ class SemesterSerializer(serializers.ModelSerializer):
         )
 
 class StudentparentSerializer(serializers.ModelSerializer):
-    student = StudentSerializer(read_only=True)
-    parent = ParentSerializer(read_only=True)
-
     class Meta:
         model = Studentparent
-        fields = '__all__'
+        fields = (
+            'student',
+            'relationship_to_student',
+            'parent'
+        )
 
 class WorkSerializer(serializers.ModelSerializer):
     class Meta:

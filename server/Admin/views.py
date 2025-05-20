@@ -7,17 +7,32 @@ import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester
-from DBApp.serializers import TeacherSerializer,StudentSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer
+from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer
 # Create your views here.
 
 @csrf_exempt
-def studentAPI(request,id=0):
+def studentAPI(request,sid=0):
     if request.method == 'GET':
         students = Student.objects.all()
-        students_serializer = StudentSerializer(students,many=True)
+        students_serializer = StudentWithIDSerializer(students,many=True)
         return JsonResponse(students_serializer.data, safe=False)
+    elif request.method == 'POST':
+        students_data=JSONParser().parse(request)
+        students_serializer=StudentSerializer(data=students_data)
+        if students_serializer.is_valid():
+            students_serializer.save()
+            return JsonResponse("Thêm học sinh vào cơ sở dữ liệu thành công!",safe=False)
+        return JsonResponse(students_serializer.errors,safe=False)
+    elif request.method == 'PUT':
+        students_data=JSONParser().parse(request)
+        students=Student.objects.get(student_id = sid)
+        students_serializer = StudentSerializer(students, data=students_data)
+        if students_serializer.is_valid():
+            students_serializer.save()
+            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
+        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        students=Student.objects.get(id=id)
+        students=Student.objects.get(student_id=sid)
         students.delete()
         return JsonResponse("Deleted Successfully!",safe=False)
     
@@ -126,7 +141,7 @@ def getStudentInClass(request, id=0):
         try:
             enrollment = Enrollment.objects.filter(class_field_id=id)
             students = [cs.student for cs in enrollment]
-            students_serializer = StudentSerializer(students, many=True)
+            students_serializer = StudentWithIDSerializer(students, many=True)
             return JsonResponse(students_serializer.data, safe=False)
         except Enrollment.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")

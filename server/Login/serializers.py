@@ -4,8 +4,10 @@ from Login.models import Userlogin
 class UserloginSerializer(serializers.ModelSerializer):
     class Meta:
         model=Userlogin
-        fields=('username',
-                'password',
-                'useremail',
-                'usertype',
-                'relatedid')
+        fields=(
+            'username',
+            'password',
+            'useremail',
+            'usertype',
+            'relatedid'
+        )
