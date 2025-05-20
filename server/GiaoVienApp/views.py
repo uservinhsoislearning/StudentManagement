@@ -109,9 +109,9 @@ def sendAttendance(request, cid=0):
                         subject = "Thông báo vắng mặt"
                         message = f"Học sinh {student.student_name} đã vắng mặt buổi học hôm nay ({today}), lớp {class_data.class_name}."
                         from_email = settings.EMAIL_HOST_USER
-                        to_email =  p.parent_email
-                        emails_sent.append(p.parent_email)
+                        to_email =  [p.parent_email]
                         send_mail(subject, message, from_email, to_email)
+                        emails_sent.append(p.parent_email)
                 except Exception as e:
                     continue  # skip if any lookup fails
 
