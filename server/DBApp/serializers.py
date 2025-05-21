@@ -114,7 +114,8 @@ class CourseSerializer(serializers.ModelSerializer):
             'course_name', 
             'course_semester',
             'course_midterm_coeff',
-            'course_final_coeff'
+            'course_final_coeff',
+            'course_credit'
         )
 
 class StudentWithIDSerializer(serializers.ModelSerializer):

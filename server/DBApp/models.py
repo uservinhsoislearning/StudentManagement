@@ -95,7 +95,7 @@ class Course(models.Model):
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
         default=0.6
     )
-
+    course_credit = models.IntegerField(default=3)
     class Meta:
         db_table = 'course'
 
