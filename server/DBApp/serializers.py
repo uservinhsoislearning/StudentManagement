@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work, ClassTimetable, Message
+from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Class, Enrollment, Work, ClassTimetable, Message, Registration
 from Login.serializers import UserloginSerializer
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -16,15 +16,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
             'deadline',
             'class_field',
             'is_exam'
-        )
-
-class AssignmentscoreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Assignmentscore
-        fields = (
-            'assignment', 
-            'student', 
-            'score'
         )
 
 class TeacherWithIDSerializer(serializers.ModelSerializer):
@@ -203,6 +194,14 @@ class ParentSerializer(serializers.ModelSerializer):
             'parent_email',
             'parent_phone_number',
             'parent_occupation'
+        )
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration
+        fields = (
+            'student',
+            'course'
         )
 
 class ReportSerializer(serializers.ModelSerializer):

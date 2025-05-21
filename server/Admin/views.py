@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 from django.utils import timezone
 
 import pandas as pd
-from DBApp.models import Class, Enrollment, Assignment, Parent
+from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester, Message
 from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer
@@ -407,6 +407,70 @@ def MessageAPI(request, user1_id, user2_id):
 
         except Userlogin.DoesNotExist:
             return JsonResponse({'error': 'User not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def registrationAPI(request, course_id=0):
+    if request.method == 'POST':
+        try:
+            # Get useremail from session
+            user_email = request.session.get('useremail')
+            if not user_email:
+                return JsonResponse({'error': 'User not logged in.'}, status=401)
+
+            # Get Userlogin object
+            user = Userlogin.objects.get(useremail=user_email)
+
+            # Ensure user is a student
+            if user.usertype != 'student':
+                return JsonResponse({'error': 'Only students can register for courses.'}, status=403)
+
+            # Get related student_id from relatedid
+            student_id = user.relatedid
+            if not student_id:
+                return JsonResponse({'error': 'No student profile associated with user.'}, status=400)
+
+            # Check if course exists
+            if not Course.objects.filter(course_id=course_id).exists():
+                return JsonResponse({'error': 'Course does not exist.'}, status=404)
+
+            # Create Registration
+            registration, created = Registration.objects.get_or_create(
+                student_id=student_id,
+                course_id=course_id
+            )
+
+            if created:
+                return JsonResponse({'message': 'Registration successful.'}, status=201)
+            else:
+                return JsonResponse({'message': 'Already registered for this course.'}, status=200)
+
+        except Userlogin.DoesNotExist:
+            return JsonResponse({'error': 'Invalid user.'}, status=400)
+    elif request.method == 'DELETE':
+        try:
+            # Get useremail from session
+            user_email = request.session.get('useremail')
+            if not user_email:
+                return JsonResponse({'error': 'User not logged in.'}, status=401)
+
+            # Find user and check if they're a student
+            user = Userlogin.objects.get(useremail=user_email)
+            if user.usertype != 'student':
+                return JsonResponse({'error': 'Only students can unregister from courses.'}, status=403)
+
+            student_id = user.relatedid
+            if not student_id:
+                return JsonResponse({'error': 'No associated student found.'}, status=400)
+
+            # Delete the registration
+            registration = Registration.objects.get(student_id=student_id, course_id=course_id)
+            registration.delete()
+            return JsonResponse({'message': 'Course unregistered successfully.'}, status=200)
+
+        except Registration.DoesNotExist:
+            return JsonResponse({'error': 'Registration does not exist.'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 

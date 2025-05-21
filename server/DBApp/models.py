@@ -39,31 +39,6 @@ class Assignment(models.Model):
     class Meta:
         db_table = 'assignment'
 
-class Assignmentscore(models.Model):
-    connect_id = models.AutoField(primary_key=True)  # Unique ID for the record
-
-    assignment = models.ForeignKey(
-        'Assignment',
-        on_delete=models.CASCADE,
-        db_column='assignment_id'
-    )
-
-    student = models.ForeignKey(
-        'Student',
-        on_delete=models.CASCADE,
-        db_column='student_id'
-    )
-
-    score = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)],
-        blank=True,
-        null=True
-    )
-
-    class Meta:
-        db_table = 'assignment_score'
-        unique_together = ('assignment', 'student')
-
 class Class(models.Model):
     class_id = models.AutoField(primary_key=True)
     class_name = models.CharField(max_length=255)
@@ -188,6 +163,14 @@ class Parent(models.Model):
     class Meta:
         db_table = 'parent'
 
+class Registration(models.Model):
+    connect_id = models.AutoField(primary_key=True)
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, db_column='course_id')
+
+    class Meta:
+        db_table = 'registration'
+        unique_together = ('student', 'course') 
 
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
