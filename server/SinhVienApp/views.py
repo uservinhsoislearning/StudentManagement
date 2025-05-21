@@ -3,6 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
+from django.utils import timezone
+
 from DBApp.models import Student, Enrollment, Assignment, Work
 
 # Create your views here.
@@ -15,7 +17,12 @@ def getSummaryStudent(request, sid=0):
 
     # Upcoming exams (assignments in those classes)
     class_ids = enrollments.values_list('class_field_id', flat=True)
-    upcoming_exams = Assignment.objects.filter(class_field_id__in=class_ids).count()
+    now = timezone.now()
+    upcoming_exams = Assignment.objects.filter(
+        class_field_id__in=class_ids,
+        is_exam=True,
+        deadline__gte=now
+    ).count()
 
     # All relevant assignments from enrolled classes
     all_assignments = Assignment.objects.filter(class_field_id__in=class_ids)
