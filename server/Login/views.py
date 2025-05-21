@@ -3,7 +3,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.hashers import check_password
 from django.utils.crypto import get_random_string
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.template.loader import render_to_string
 
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
@@ -129,21 +130,21 @@ def forgotPassword(request):
         user_data = JSONParser().parse(request)
         try:
             user_data_by_mail = Userlogin.objects.get(useremail=user_data['useremail'])
-            # Generate a random token (e.g., for password reset)
             token = get_random_string(length=32)
+            reset_link = f"https://yourdomain.com/reset-password?token={token}"  # Replace with your actual reset page
 
-            # You'd save this token somewhere (e.g., a reset_token field or a separate model)
-            # For this example, just include it in the email
-            reset_link = f"https://youtu.be/dQw4w9WgXcQ?si=QBse2atAbns4GNUZ" # Reset password page, for now it's rickroll
+            html_content = render_to_string("login.html", {
+                'username': user_data_by_mail.username,
+                'reset_link': reset_link,
+            })
 
-            # Send reset email
-            send_mail(
-                subject='Password Reset Request',
-                message=f"Hi {user_data_by_mail.username},\n\nClick the link below to reset your password:\n{reset_link}",
-                from_email=settings.EMAIL_HOST_USER, 
-                recipient_list=[user_data_by_mail.useremail],
-                fail_silently=False,
-            )
+            subject = 'Đặt lại mật khẩu'
+            from_email = settings.EMAIL_HOST_USER
+            to = user_data_by_mail.useremail
+
+            email = EmailMultiAlternatives(subject, "", from_email, [to])
+            email.attach_alternative(html_content, "text/html")
+            email.send()
 
             return JsonResponse("Email reset đã được gửi thành công!", safe=False)
         except Userlogin.DoesNotExist:
