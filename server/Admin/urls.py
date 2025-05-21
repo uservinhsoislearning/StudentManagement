@@ -34,12 +34,15 @@ urlpatterns = [
     re_path(r'^api/semesters/([0-9]+)$', views.SemesterAPI),
     re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI),
 
-    re_path(r'^api/parents', views.ParentAPI),
-    re_path(r'^api/parents/(?P<pid>\d+)', views.ParentAPI),
+    re_path(r'^api/parents$', views.ParentAPI),
+    re_path(r'^api/parents/(?P<pid>\d+)$', views.ParentAPI),
 
-    re_path(r'^api/student/(?P<sid>\d+)/grades', views.getGradeStudent),
+    re_path(r'^api/student/(?P<sid>\d+)/grades$', views.getGradeStudent),
 
-    re_path(r'^api/student/(?P<sid>\d+)/schedule', views.ClassTimetableAPI),
+    re_path(r'^api/student/(?P<sid>\d+)/schedule$', views.ClassTimetableAPI),
 
-    re_path(r'^api/dashboard/admin', views.getSummaryAdmin)
+    re_path(r'^api/dashboard/admin$', views.getSummaryAdmin),
+
+    re_path(r'^api/messages$', views.MessageAPI),
+    re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', views.MessageAPI)
 ]

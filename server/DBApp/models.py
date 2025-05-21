@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+
+from django.utils import timezone
 import os
 
 class Admin(models.Model):
@@ -153,6 +155,27 @@ class Enrollment(models.Model): #This should be fixed
     class Meta:
         db_table = 'enrollment'
 
+class Message(models.Model):
+    message_id = models.AutoField(primary_key=True)
+
+    sender = models.ForeignKey(
+        'Login.Userlogin',
+        on_delete=models.CASCADE,
+        related_name='sent_messages'
+    )
+    receiver = models.ForeignKey(
+        'Login.Userlogin',
+        on_delete=models.CASCADE,
+        related_name='received_messages'
+    )
+
+    content = models.TextField(max_length=5000)
+    timestamp = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)  # Track if the receiver has read the message
+
+    class Meta:
+        db_table = 'message'
+        ordering = ['-timestamp']
 
 class Parent(models.Model):
     parent_id = models.AutoField(primary_key=True)

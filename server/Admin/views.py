@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
+from django.utils import timezone
 
 import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
-from DBApp.models import Teacher,Student, Course, Report, Semester
-from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer
+from DBApp.models import Teacher,Student, Course, Report, Semester, Message
+from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer
+from Login.models import Userlogin
 # Create your views here.
 
 @csrf_exempt
@@ -353,7 +355,6 @@ def ParentAPI(request, pid=0):
         parents.delete()
         return JsonResponse("Xóa bố/mẹ thành công!",safe=False)
     
-
 @csrf_exempt
 def ClassTimetableAPI(request, sid=0):
     if request.method == 'GET':
@@ -363,6 +364,52 @@ def ClassTimetableAPI(request, sid=0):
         serializer = ClassWithTimetableSerializer(classes, many=True)
         return JsonResponse(serializer.data, safe=False)
     
+@csrf_exempt
+def MessageAPI(request, user1_id, user2_id):
+    if request.method == 'GET':
+        try:
+            messages_user1_to_user2 = Message.objects.filter(
+                sender_id=user1_id, receiver_id=user2_id
+            )
+            # Get messages from user2 to user1
+            messages_user2_to_user1 = Message.objects.filter(
+                sender_id=user2_id, receiver_id=user1_id
+            )
+            # Combine the two querysets
+            all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
+
+            serializer = MessageSerializer(all_messages, many=True)
+            return JsonResponse(serializer.data)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    elif request.method == 'POST':
+        try:
+            sender_id = request.data.get('sender_id')
+            receiver_id = request.data.get('receiver_id')
+            content = request.data.get('content')
+
+            if not all([sender_id, receiver_id, content]):
+                return JsonResponse({'error': 'Missing required fields.'}, status=400)
+
+            sender = Userlogin.objects.get(user_id=sender_id)
+            receiver = Userlogin.objects.get(user_id=receiver_id)
+
+            message = Message.objects.create(
+                sender=sender,
+                receiver=receiver,
+                content=content,
+                timestamp=timezone.now()
+            )
+
+            message_serializer = MessageSerializer(message)
+            return JsonResponse(message_serializer.data, safe=False)
+
+        except Userlogin.DoesNotExist:
+            return JsonResponse({'error': 'User not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
 @csrf_exempt
 def getSummaryAdmin(request):
     if request.method == 'GET':

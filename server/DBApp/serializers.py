@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work, ClassTimetable
+from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Assignmentscore, Class, Enrollment, Work, ClassTimetable, Message
+from Login.serializers import UserloginSerializer
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -178,6 +179,15 @@ class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
             'final',
             'grade'
         )
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserloginSerializer(read_only=True)
+    receiver = UserloginSerializer(read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ['message_id', 'sender', 'receiver', 'content', 'timestamp', 'is_read']
 
 class ParentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
