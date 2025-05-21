@@ -27,6 +27,7 @@ def userLoginAPI(request):
         try:
             user = Userlogin.objects.get(useremail=user_data['useremail'])
             if check_password(user_data['password'], user.password):
+                request.session['user_id'] = user.user_id
                 return JsonResponse({"message": "Đăng nhập thành công!", "username": user.username, "usertype": user.usertype}) #Dang nhap thanh cong
             else:
                 return JsonResponse("Mật khẩu không đúng!",safe=False) #Mat khau sai
@@ -149,3 +150,25 @@ def forgotPassword(request):
             return JsonResponse("Email reset đã được gửi thành công!", safe=False)
         except Userlogin.DoesNotExist:
             return JsonResponse("Tài khoản không tồn tại!", safe=False)
+        
+@csrf_exempt
+def getCurrentUser(request):
+    if request.method == 'GET':
+        user_id = request.session.get('user_id')
+        try:
+            user = Userlogin.objects.get(user_id=user_id)
+        except Userlogin.DoesNotExist:
+            return JsonResponse({"error": "User not logged in"}, status=401)
+
+        return JsonResponse({
+            "user_id": user.user_id,
+            "email": user.useremail,
+            "usertype": user.usertype,
+            "relatedid": user.relatedid
+        })
+
+@csrf_exempt
+def userLogout(request):
+    if request.method == 'POST':
+        request.session.flush()
+        return JsonResponse("Logged out successfully!", safe=False)
