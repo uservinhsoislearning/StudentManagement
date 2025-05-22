@@ -240,6 +240,16 @@ class WorkSerializer(serializers.ModelSerializer):
         fields = (
             'assignment',
             'student',
+            'class_field',
+            'text_content',
+            'file',
+            'score'
+        )
+
+class WorkScoreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Work
+        fields = (
             'text_content',
             'file',
             'score'

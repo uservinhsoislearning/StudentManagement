@@ -290,6 +290,7 @@ class Work(models.Model):
     work_id = models.AutoField(primary_key=True)
     assignment = models.ForeignKey('Assignment', on_delete=models.CASCADE, db_column='assignment_id')
     student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
 
     text_content = models.TextField(
         max_length=10000,
@@ -314,4 +315,4 @@ class Work(models.Model):
 
     class Meta:
         db_table = 'work'
-        unique_together = ('assignment', 'student')  # One submission per student per assignment
+        unique_together = ('assignment', 'student')

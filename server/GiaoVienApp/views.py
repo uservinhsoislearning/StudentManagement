@@ -10,8 +10,8 @@ from django.core.mail import send_mail
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
 
-from DBApp.models import Enrollment, Class, Student, Studentparent, Parent
-from DBApp.serializers import EnrollmentSerializer
+from DBApp.models import Enrollment, Class, Student, Studentparent, Parent, Work
+from DBApp.serializers import EnrollmentSerializer, WorkScoreSerializer
 
 import server.settings as settings
 
@@ -113,9 +113,30 @@ def sendAttendance(request, cid=0):
                         send_mail(subject, message, from_email, to_email)
                         emails_sent.append(p.parent_email)
                 except Exception as e:
-                    continue  # skip if any lookup fails
+                    continue  
 
             return JsonResponse({"message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!", "recipients": emails_sent})
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+        
+@csrf_exempt
+def gradeWorkAPI(request,cid=0,sid=0,aid=0):
+    if request.method == 'PUT':
+        work_data = JSONParser().parse(request)
+        work_serializer = WorkScoreSerializer(data={'score': work_data['score']}, partial=True)
+        if work_serializer.is_valid():
+            work_serializer.save()
+            return JsonResponse(work_serializer.data, safe=False)
+        return JsonResponse(work_serializer.errors, status=400)
+
+    # DELETE request: delete the work entry
+    elif request.method == 'DELETE':
+        if cid == 0 or sid == 0 or aid == 0:
+            return JsonResponse("Thiếu thông tin trong URL!", safe=False)
+        try:
+            work = Work.objects.get(class_field=cid, student=sid, assignment=aid)
+            work.delete()
+            return JsonResponse("Work entry deleted successfully", safe=False)
+        except Work.DoesNotExist:
+            return JsonResponse("Không có bài làm này!", safe=False)

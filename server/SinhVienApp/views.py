@@ -6,8 +6,28 @@ from django.http.response import JsonResponse
 from django.utils import timezone
 
 from DBApp.models import Student, Enrollment, Assignment, Work
+from DBApp.serializers import WorkSerializer, WorkScoreSerializer
 
 # Create your views here.
+@csrf_exempt
+def submitWork(request, cid=0, aid=0, sid=0):
+    if request.method == 'GET':
+        work = Work.objects.filter(class_field=cid,assignment=aid,student=sid)
+        work_serializer = WorkScoreSerializer(work, many=True)
+        return JsonResponse(work_serializer.data, safe=False)
+    elif request.method == 'POST':
+        work_data = JSONParser().parse(request)
+
+        work_data['class_field'] = cid
+        work_data['assignment'] = aid
+        work_data['student'] = sid
+
+        work_serializer=WorkSerializer(data=work_data)
+        if work_serializer.is_valid():
+            work_serializer.save()
+            return JsonResponse("Gửi bài tập thành công!", safe=False)
+        return JsonResponse(work_serializer.errors, status=400)
+
 @csrf_exempt
 def getSummaryStudent(request, sid=0):
     # Get enrolled classes
