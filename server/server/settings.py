@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import DBINFO as INFO
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     'corsheaders',
     'SinhVienApp.apps.SinhvienappConfig',
     'GiaoVienApp.apps.GiaovienappConfig',
-    'Admin.apps.AdminConfig'
+    'Admin.apps.AdminConfig',
+    'Login.apps.LoginConfig',
+    'DBApp'
 ]
 
-CORS_ORIGIN_ALLOw_ALL = True # Không tốt khi chạy production 
+CORS_ORIGIN_ALLOW_ALL = True # Không tốt khi chạy production 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -63,7 +65,7 @@ ROOT_URLCONF = 'server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,7 +84,7 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn.
+DATABASES = { # Database, tuy nhiên mật khẩu và user phải được ẩn. (resolved)
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': INFO.DB_NAME,
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 USE_I18N = True
 
@@ -134,3 +136,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = INFO.EMAIL_ADD
+EMAIL_HOST_PASSWORD = INFO.EMAIL_PASS
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
