@@ -5,12 +5,13 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 from django.utils import timezone
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template.loader import render_to_string
 
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
 
-from DBApp.models import Enrollment, Class, Student, Studentparent, Parent, Work
+from DBApp.models import Enrollment, Class, Student, Studentparent, Work
 from DBApp.serializers import EnrollmentSerializer, WorkScoreSerializer
 
 import server.settings as settings
@@ -103,16 +104,28 @@ def sendAttendance(request, cid=0):
                     student = Student.objects.get(student_id=sid)
                     dummy = Studentparent.objects.filter(student=sid)
                     class_data = Class.objects.get(class_id=cid)
+                    teacher=class_data.class_teacher
                     for dum in dummy:
                         p = dum.parent
-                        print("Reached!")
                         subject = "Thông báo vắng mặt"
-                        message = f"Học sinh {student.student_name} đã vắng mặt buổi học hôm nay ({today}), lớp {class_data.class_name}."
+
+                        html_message = render_to_string('absent.html', {
+                            'student_name': student.student_name,
+                            'class_name': class_data.class_name,
+                            'date': today,
+                            'teacher_email': teacher.teacher_email
+                        })
+                        plain_message = f"Học sinh {student.student_name} đã vắng mặt buổi học hôm nay ({today}), lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
                         from_email = settings.EMAIL_HOST_USER
-                        to_email =  [p.parent_email]
-                        send_mail(subject, message, from_email, to_email)
+                        to_email = [p.parent_email]
+
+                        # Send email with HTML and plain fallback
+                        email = EmailMultiAlternatives(subject, plain_message, from_email, to_email)
+                        email.attach_alternative(html_message, "text/html")
+                        email.send()
                         emails_sent.append(p.parent_email)
                 except Exception as e:
+                    print(f"Error processing {e}")
                     continue  
 
             return JsonResponse({"message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!", "recipients": emails_sent})
