@@ -90,7 +90,7 @@ class ClassWithTimetableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Class
-        fields = ('class_id', 'class_name', 'class_teacher', 'timetables')
+        fields = ('class_id', 'class_name', 'class_teacher', 'class_semester', 'timetables')
 
 class CourseWithIDSerializer(serializers.ModelSerializer):
     class Meta:
