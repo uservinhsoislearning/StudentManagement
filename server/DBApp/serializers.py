@@ -37,9 +37,7 @@ class ClassWithCourseSerializer(serializers.ModelSerializer):
             'class_name',
             'class_teacher',
             'class_semester',
-            'course',
-            'start_time',
-            'end_time'
+            'course'
         )
 
 class ClassWithIDSerializer(serializers.ModelSerializer):
@@ -51,9 +49,7 @@ class ClassWithIDSerializer(serializers.ModelSerializer):
             'class_id',
             'class_name',
             'class_teacher',
-            'class_semester',
-            'start_time',
-            'end_time'
+            'class_semester'
         )
 
 class TeacherWithIDSerializer(serializers.ModelSerializer):
@@ -77,9 +73,7 @@ class ClassSerializer(serializers.ModelSerializer):
         fields = (
             'class_name',
             'class_teacher',
-            'class_semester',
-            'start_time',
-            'end_time'
+            'class_semester'
         )
 
 class ClassTimetableSerializer(serializers.ModelSerializer):
@@ -96,7 +90,7 @@ class ClassWithTimetableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Class
-        fields = ('class_id', 'class_name', 'timetables')
+        fields = ('class_id', 'class_name', 'class_teacher', 'timetables')
 
 class CourseWithIDSerializer(serializers.ModelSerializer):
     class Meta:

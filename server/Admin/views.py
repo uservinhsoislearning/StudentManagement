@@ -42,7 +42,7 @@ def studentAPI(request,sid=0):
 def classAPI(request,id=0):
     if request.method == 'GET':
         classes=Class.objects.all()
-        classes_serializer = ClassWithIDSerializer(classes,many=True)
+        classes_serializer = ClassWithTimetableSerializer(classes,many=True)
         return JsonResponse(classes_serializer.data, safe=False)
     elif request.method == 'POST':
         classes_data=JSONParser().parse(request)
