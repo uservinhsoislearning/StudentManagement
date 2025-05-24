@@ -8,7 +8,7 @@ import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
 from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester, Message
-from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer
+from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer, SemesterWithIDSerializer
 from Login.models import Userlogin
 # Create your views here.
 
@@ -296,7 +296,7 @@ def ReportAPI(request, user_id=0): #This post method is currently not available 
 def SemesterAPI(request, sem_id=0):
     if request.method == 'GET':
         semesters = Semester.objects.all()
-        semesters_serializer = SemesterSerializer(semesters, many=True)
+        semesters_serializer = SemesterWithIDSerializer(semesters, many=True)
         return JsonResponse(semesters_serializer.data, safe=False)
     elif request.method == 'POST':
         semesters_data = JSONParser().parse(request)

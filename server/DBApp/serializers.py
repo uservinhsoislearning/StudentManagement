@@ -18,17 +18,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
             'is_exam'
         )
 
-class TeacherWithIDSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Teacher
-        fields = (
-            'teacher_id',
-            'teacher_name',
-            'teacher_gender',
-            'teacher_email',
-            'teacher_profession'
-        )
-
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Teacher
@@ -65,6 +54,19 @@ class ClassWithIDSerializer(serializers.ModelSerializer):
             'class_semester',
             'start_time',
             'end_time'
+        )
+
+class TeacherWithIDSerializer(serializers.ModelSerializer):
+    classes = ClassWithIDSerializer(source='class_set', many=True)
+    class Meta:
+        model = Teacher
+        fields = (
+            'teacher_id',
+            'teacher_name',
+            'teacher_gender',
+            'teacher_email',
+            'teacher_profession',
+            'classes'
         )
 
 class ClassSerializer(serializers.ModelSerializer):
@@ -214,6 +216,11 @@ class ReportSerializer(serializers.ModelSerializer):
             'sender',
             'status'
         )
+
+class SemesterWithIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semester
+        fields = '__all__'
 
 class SemesterSerializer(serializers.ModelSerializer):
     class Meta:
