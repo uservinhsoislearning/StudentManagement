@@ -92,11 +92,7 @@ def teacherAPI(request,tid=0):
 
 @csrf_exempt
 def EnrollmentAPI(request, class_id=0, student_id=0):
-    if request.method == 'GET':
-        enrollment=Enrollment.objects.filter(class_field = class_id)
-        enrollment_serializer = EnrollmentGradeSerializer(enrollment,many=True)
-        return JsonResponse(enrollment_serializer.data, safe=False)
-    elif request.method == 'POST':
+    if request.method == 'POST':
         enrollment_data=JSONParser().parse(request)
         enrollment_data['withdrawal_date'] = None 
         enrollment_data['grade'] = None
@@ -136,6 +132,13 @@ def EnrollmentAPI(request, class_id=0, student_id=0):
             return JsonResponse("Xóa học sinh khỏi lớp thành công!", safe=False)
         except Enrollment.DoesNotExist:
             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
+
+@csrf_exempt
+def getGradeClass(request, cid=0):
+    if request.method == 'GET':
+        enrollment=Enrollment.objects.filter(class_field = cid)
+        enrollment_serializer = EnrollmentGradeSerializer(enrollment,many=True)
+        return JsonResponse(enrollment_serializer.data, safe=False)
 
 @csrf_exempt
 def getStudentInClass(request, id=0):

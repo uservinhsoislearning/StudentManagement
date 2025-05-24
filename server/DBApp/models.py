@@ -99,7 +99,7 @@ class Course(models.Model):
     class Meta:
         db_table = 'course'
 
-class Enrollment(models.Model): #This should be fixed
+class Enrollment(models.Model):
     enrollment_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(
         'Student', 

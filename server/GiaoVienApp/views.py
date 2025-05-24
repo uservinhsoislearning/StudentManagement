@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
+from django.db.models import Avg, Max, Min
 from django.utils import timezone
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -153,3 +154,25 @@ def gradeWorkAPI(request,cid=0,sid=0,aid=0):
             return JsonResponse("Work entry deleted successfully", safe=False)
         except Work.DoesNotExist:
             return JsonResponse("Không có bài làm này!", safe=False)
+        
+@csrf_exempt
+def getClassStats(request, cid=0):
+    if request.method == 'GET':
+        # Get all grades for this class
+        class_enrollments = Enrollment.objects.filter(class_field_id=cid)
+
+        # Compute statistics
+        stats = class_enrollments.aggregate(
+            maxScore=Max('grade'),
+            minScore=Min('grade'),
+            avgScore=Avg('grade')
+        )
+
+        # Build response
+        grade_data = {
+            'maxScore': stats['maxScore'],
+            'minScore': stats['minScore'],
+            'avgScore': round(stats['avgScore'], 2) if stats['avgScore'] is not None else None
+        }
+
+        return JsonResponse(data=grade_data, safe=False)
