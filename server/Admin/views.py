@@ -6,7 +6,7 @@ from django.utils import timezone
 
 import pandas as pd
 from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
-from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer
+from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer, CourseWithIDSerializer
 from DBApp.models import Teacher,Student, Course, Report, Semester, Message
 from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer, SemesterWithIDSerializer
 from Login.models import Userlogin
@@ -205,7 +205,7 @@ def AssignmentFileAPI(request,id=0):
 def CourseAPI(request,id=0):
     if request.method == 'GET':
         courses=Course.objects.all()
-        courses_serializer = CourseSerializer(courses,many=True)
+        courses_serializer = CourseWithIDSerializer(courses,many=True)
         return JsonResponse(courses_serializer.data, safe=False)
     elif request.method == 'POST':
         courses_data=JSONParser().parse(request)

@@ -95,13 +95,7 @@ class ClassWithTimetableSerializer(serializers.ModelSerializer):
 class CourseWithIDSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = (
-            'course_id',
-            'course_name', 
-            'course_semester',
-            'course_midterm_coeff',
-            'course_final_coeff'
-        )
+        fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
