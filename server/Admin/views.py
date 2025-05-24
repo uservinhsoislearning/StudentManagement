@@ -65,7 +65,7 @@ def classAPI(request,id=0):
         return JsonResponse("Xóa lớp thành công!",safe=False)
     
 @csrf_exempt
-def teacherAPI(request,id=0):
+def teacherAPI(request,tid=0):
     if request.method == 'GET':
         teachers=Teacher.objects.all()
         teachers_serializer = TeacherWithIDSerializer(teachers,many=True)
@@ -86,7 +86,7 @@ def teacherAPI(request,id=0):
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        teachers=Teacher.objects.get(class_id=id)
+        teachers=Teacher.objects.get(teacher_id=tid)
         teachers.delete()
         return JsonResponse("Xóa thầy/cô thành công!",safe=False)
 
