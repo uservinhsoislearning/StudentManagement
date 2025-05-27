@@ -503,7 +503,22 @@ def registrationAPI(request, class_id=0):
             return JsonResponse({'error': 'Registration does not exist.'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-        
+
+@csrf_exempt
+def getRegistrated(request,sid=0):
+    if request.method == 'GET':
+        try:
+            # Get all registrations for the student
+            registrations = m.Registration.objects.filter(student_id=sid).select_related('class_field')
+
+            # Extract class names
+            class_names = [reg.class_field.class_name for reg in registrations if reg.class_field]
+
+            return JsonResponse({'registered_classes': class_names}, status=200)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
 @csrf_exempt
 def getSummaryAdmin(request):
     if request.method == 'GET':

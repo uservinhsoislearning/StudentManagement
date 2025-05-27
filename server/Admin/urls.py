@@ -47,5 +47,7 @@ urlpatterns = [
     re_path(r'^api/messages$', views.MessageAPI),
     re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', views.MessageAPI),
 
-    re_path(r'^api/registrations/(?P<class_id>\d+)$', views.registrationAPI)
+    re_path(r'^api/registrations/(?P<class_id>\d+)$', views.registrationAPI),
+
+    re_path(r'^api/registrations/registered/(?P<sid>\d+)$', views.getRegistrated)
 ]
