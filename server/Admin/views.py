@@ -192,14 +192,27 @@ def AssignmentAPI(request, id=0):
 @csrf_exempt
 def AssignmentFileAPI(request,id=0):
     if request.method == "POST":
-        assignments_data=JSONParser().parse(request)
-        assignments_data['class_field'] = id
-        assignments_data['text_content'] = None
-        assignments_serializer=s.AssignmentSerializer(data=assignments_data)
-        if assignments_serializer.is_valid():
-            assignments_serializer.save()
-            return JsonResponse("Thêm bài tập thành công!",safe=False)
-        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+        try:
+            # Copy POST data and add the class_field
+            assignments_data = request.POST.copy()
+            assignments_data['class_field'] = id  # Foreign key to Class
+
+            # Handle uploaded file
+            if 'file' in request.FILES:
+                assignments_data['file'] = request.FILES['file']
+            else:
+                return JsonResponse({'error': 'No file uploaded.'}, status=400)
+
+            # Include the file in serializer's files argument
+            assignments_serializer = s.AssignmentSerializer(data=assignments_data)
+            if assignments_serializer.is_valid():
+                assignments_serializer.save()
+                return JsonResponse({'message': 'Assignment uploaded successfully.'}, status=201)
+            else:
+                return JsonResponse({'error': assignments_serializer.errors}, status=400)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt        
 def CourseAPI(request,crid=0):
