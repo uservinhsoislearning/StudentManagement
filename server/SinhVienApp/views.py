@@ -5,7 +5,7 @@ from django.http.response import JsonResponse
 
 from django.utils import timezone
 
-from DBApp.models import Student, Enrollment, Assignment, Work
+from DBApp.models import Enrollment, Assignment, Work
 from DBApp.serializers import WorkSerializer, WorkScoreSerializer
 
 # Create your views here.

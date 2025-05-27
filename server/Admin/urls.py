@@ -1,9 +1,6 @@
 from django.urls import re_path
 from Admin import views
 
-# from django.conf.urls.static import static
-# from django.conf import settings
-
 urlpatterns = [
     re_path(r'^api/students$', views.studentAPI),
     re_path(r'^api/students/([0-9]+)$', views.studentAPI),
@@ -26,7 +23,9 @@ urlpatterns = [
     re_path(r'^api/classes/([0-9]+)/assignments$', views.AssignmentFileAPI),
 
     re_path(r'^api/course-classes$', views.CourseAPI),
-    re_path(r'^api/course-classes/([0-9]+)$', views.CourseAPI),
+    re_path(r'^api/course-classes/(?P<crid>\d+)$', views.CourseAPI),
+
+    re_path(r'^api/course-classes-both$', views.CourseAndClass),
             
     re_path(r'^api/course-classes/import$', views.CSVUploadCourse),
 

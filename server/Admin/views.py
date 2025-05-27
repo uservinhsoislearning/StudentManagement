@@ -5,88 +5,89 @@ from django.http.response import JsonResponse
 from django.utils import timezone
 
 import pandas as pd
-from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
-from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer, CourseWithIDSerializer
-from DBApp.models import Teacher,Student, Course, Report, Semester, Message
-from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer, SemesterWithIDSerializer
+import DBApp.models as m
+import DBApp.serializers as s
+# from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
+# from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer, CourseWithIDSerializer
+# from DBApp.models import Teacher,Student, Course, Report, Semester, Message
+# from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer, SemesterWithIDSerializer, CourseClassSerializer
 from Login.models import Userlogin
-# Create your views here.
 
 @csrf_exempt
 def studentAPI(request,sid=0):
     if request.method == 'GET':
-        students = Student.objects.all()
-        students_serializer = StudentWithIDSerializer(students,many=True)
+        students = m.Student.objects.all()
+        students_serializer = s.StudentWithIDSerializer(students,many=True)
         return JsonResponse(students_serializer.data, safe=False)
     elif request.method == 'POST':
         students_data=JSONParser().parse(request)
-        students_serializer=StudentSerializer(data=students_data)
+        students_serializer=s.StudentSerializer(data=students_data)
         if students_serializer.is_valid():
             students_serializer.save()
             return JsonResponse("Thêm học sinh vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse(students_serializer.errors,safe=False)
     elif request.method == 'PUT':
         students_data=JSONParser().parse(request)
-        students=Student.objects.get(student_id = sid)
-        students_serializer = StudentSerializer(students, data=students_data)
+        students=m.Student.objects.get(student_id = sid)
+        students_serializer = s.StudentSerializer(students, data=students_data)
         if students_serializer.is_valid():
             students_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        students=Student.objects.get(student_id=sid)
+        students=m.Student.objects.get(student_id=sid)
         students.delete()
         return JsonResponse("Deleted Successfully!",safe=False)
     
 @csrf_exempt
 def classAPI(request,id=0):
     if request.method == 'GET':
-        classes=Class.objects.all()
-        classes_serializer = ClassWithTimetableSerializer(classes,many=True)
+        classes=m.Class.objects.all()
+        classes_serializer=s.ClassWithTimetableSerializer(classes,many=True)
         return JsonResponse(classes_serializer.data, safe=False)
     elif request.method == 'POST':
         classes_data=JSONParser().parse(request)
-        classes_serializer=ClassWithCourseSerializer(data=classes_data)
+        classes_serializer=s.ClassWithCourseSerializer(data=classes_data)
         if classes_serializer.is_valid():
             classes_serializer.save()
             return JsonResponse("Thêm lớp vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse(classes_serializer.errors,safe=False)
     elif request.method == 'PUT':
         classes_data=JSONParser().parse(request)
-        classes=Class.objects.get(class_id = classes_data['class_id'])
-        classes_serializer = ClassSerializer(classes, data=classes_data)
+        classes=m.Class.objects.get(class_id = classes_data['class_id'])
+        classes_serializer=s.ClassSerializer(classes, data=classes_data)
         if classes_serializer.is_valid():
             classes_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        classes=Class.objects.get(class_id=id)
+        classes=m.Class.objects.get(class_id=id)
         classes.delete()
         return JsonResponse("Xóa lớp thành công!",safe=False)
     
 @csrf_exempt
 def teacherAPI(request,tid=0):
     if request.method == 'GET':
-        teachers=Teacher.objects.all()
-        teachers_serializer = TeacherWithIDSerializer(teachers,many=True)
+        teachers=m.Teacher.objects.all()
+        teachers_serializer=s.TeacherWithIDSerializer(teachers,many=True)
         return JsonResponse(teachers_serializer.data, safe=False)
     elif request.method == 'POST':
         teachers_data=JSONParser().parse(request)
-        teachers_serializer=TeacherSerializer(data=teachers_data)
+        teachers_serializer=s.TeacherSerializer(data=teachers_data)
         if teachers_serializer.is_valid():
             teachers_serializer.save()
             return JsonResponse("Thêm thầy/cô vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         teachers_data=JSONParser().parse(request)
-        teachers=Teacher.objects.get(teacher_id = teachers_data['teacher_id'])
-        teachers_serializer = TeacherSerializer(teachers, data=teachers_data)
+        teachers=m.Teacher.objects.get(teacher_id = teachers_data['teacher_id'])
+        teachers_serializer=s.TeacherSerializer(teachers, data=teachers_data)
         if teachers_serializer.is_valid():
             teachers_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        teachers=Teacher.objects.get(teacher_id=tid)
+        teachers=m.Teacher.objects.get(teacher_id=tid)
         teachers.delete()
         return JsonResponse("Xóa thầy/cô thành công!",safe=False)
 
@@ -98,7 +99,7 @@ def EnrollmentAPI(request, class_id=0, student_id=0):
         enrollment_data['grade'] = None
         enrollment_data['midterm'] = None
         enrollment_data['final'] = None
-        enrollment_serializer=EnrollmentSerializer(data=enrollment_data)
+        enrollment_serializer=s.EnrollmentSerializer(data=enrollment_data)
         if enrollment_serializer.is_valid():
             enrollment_serializer.save()
             return JsonResponse("Thêm học sinh vào lớp thành công!",safe=False)
@@ -108,8 +109,8 @@ def EnrollmentAPI(request, class_id=0, student_id=0):
             return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
 
         try:
-            enrollment = Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
-        except Enrollment.DoesNotExist:
+            enrollment=m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
+        except m.Enrollment.DoesNotExist:
             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
         update_data = JSONParser().parse(request)
@@ -120,55 +121,55 @@ def EnrollmentAPI(request, class_id=0, student_id=0):
         enrollment.final = update_data.get('final', enrollment.final)
         enrollment.save()
 
-        serializer = EnrollmentSerializer(enrollment)
+        serializer = s.EnrollmentSerializer(enrollment)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'DELETE':
         if class_id == 0 or student_id == 0:
             return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
 
         try:
-            enrollment = Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
+            enrollment = m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
             enrollment.delete()
             return JsonResponse("Xóa học sinh khỏi lớp thành công!", safe=False)
-        except Enrollment.DoesNotExist:
+        except m.Enrollment.DoesNotExist:
             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
 @csrf_exempt
 def getGradeClass(request, cid=0):
     if request.method == 'GET':
-        enrollment=Enrollment.objects.filter(class_field = cid)
-        enrollment_serializer = EnrollmentGradeSerializer(enrollment,many=True)
+        enrollment=m.Enrollment.objects.filter(class_field = cid)
+        enrollment_serializer=s.EnrollmentGradeSerializer(enrollment,many=True)
         return JsonResponse(enrollment_serializer.data, safe=False)
 
 @csrf_exempt
 def getStudentInClass(request, id=0):
     if request.method == 'POST':
         try:
-            enrollment = Enrollment.objects.filter(class_field_id=id)
+            enrollment=m.Enrollment.objects.filter(class_field_id=id)
             students = [cs.student for cs in enrollment]
-            students_serializer = StudentWithIDSerializer(students, many=True)
+            students_serializer=s.StudentWithIDSerializer(students, many=True)
             return JsonResponse(students_serializer.data, safe=False)
-        except Enrollment.DoesNotExist:
+        except m.Enrollment.DoesNotExist:
             return JsonResponse("Không tìm được lớp!")
         
 @csrf_exempt
 def getGradeStudent(request, sid=0):
     if request.method == 'GET':
-        enrollment=Enrollment.objects.filter(student = sid)
-        enrollment_serializer = EnrollmentGradeSubjectSerializer(enrollment,many=True)
+        enrollment=m.Enrollment.objects.filter(student = sid)
+        enrollment_serializer=s.EnrollmentGradeSubjectSerializer(enrollment,many=True)
         return JsonResponse(enrollment_serializer.data, safe=False)
         
 @csrf_exempt
 def AssignmentAPI(request, id=0):
     if request.method == 'GET':
-        assignments=Assignment.objects.filter(class_field = id)
-        assignments_serializer = AssignmentSerializer(assignments,many=True)
+        assignments=m.Assignment.objects.filter(class_field = id)
+        assignments_serializer=s.AssignmentSerializer(assignments,many=True)
         return JsonResponse(assignments_serializer.data, safe=False)
     elif request.method == 'POST':
         assignments_data=JSONParser().parse(request)
         assignments_data['class_field'] = id
         assignments_data['file'] = None
-        assignments_serializer=AssignmentSerializer(data=assignments_data)
+        assignments_serializer=s.AssignmentSerializer(data=assignments_data)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
             return JsonResponse("Thêm bài tập thành công!",safe=False)
@@ -178,17 +179,17 @@ def AssignmentAPI(request, id=0):
     )
     elif request.method == 'PUT':
         assignments_data=JSONParser().parse(request)
-        assignments=Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
+        assignments=m.Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
         try:
-            assignments_serializer = AssignmentSerializer(assignments, data=assignments_data,class_field = id)
-        except Assignment.DoesNotExist:
+            assignments_serializer=s.AssignmentSerializer(assignments, data=assignments_data,class_field = id)
+        except m.Assignment.DoesNotExist:
             return JsonResponse("Không tìm thấy bài tập cho lớp này!", safe=False)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
             return JsonResponse("Cập nhật bài tập thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được bài tập!", safe=False)
     elif request.method == 'DELETE':
-        assignments=Assignment.objects.get(class_id=id)
+        assignments=m.Assignment.objects.get(class_id=id)
         assignments.delete()
         return JsonResponse("Xóa bài tập thành công!",safe=False)
 
@@ -198,37 +199,74 @@ def AssignmentFileAPI(request,id=0):
         assignments_data=JSONParser().parse(request)
         assignments_data['class_field'] = id
         assignments_data['text_content'] = None
-        assignments_serializer=AssignmentSerializer(data=assignments_data)
+        assignments_serializer=s.AssignmentSerializer(data=assignments_data)
         if assignments_serializer.is_valid():
             assignments_serializer.save()
             return JsonResponse("Thêm bài tập thành công!",safe=False)
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
 
 @csrf_exempt        
-def CourseAPI(request,id=0):
+def CourseAPI(request,crid=0):
     if request.method == 'GET':
-        courses=Course.objects.all()
-        courses_serializer = CourseWithIDSerializer(courses,many=True)
+        courses=m.Course.objects.all()
+        courses_serializer=s.CourseWithIDSerializer(courses,many=True)
         return JsonResponse(courses_serializer.data, safe=False)
     elif request.method == 'POST':
         courses_data=JSONParser().parse(request)
-        courses_serializer=CourseSerializer(data=courses_data)
+        courses_serializer=s.CourseSerializer(data=courses_data)
         if courses_serializer.is_valid():
             courses_serializer.save()
             return JsonResponse("Thêm môn học vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
     elif request.method == 'PUT':
         courses_data=JSONParser().parse(request)
-        courses=Course.objects.get(course_id = id)
-        courses_serializer = CourseSerializer(courses, data=courses_data)
+        courses=m.Course.objects.get(course_id=crid)
+        courses_serializer=s.CourseSerializer(courses, data=courses_data)
         if courses_serializer.is_valid():
             courses_serializer.save()
             return JsonResponse("Cập nhật thông tin môn học thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        courses=Course.objects.get(course_id=id)
+        courses=m.Course.objects.get(course_id=crid)
         courses.delete()
         return JsonResponse("Xóa môn học thành công!",safe=False)
+
+@csrf_exempt
+def CourseAndClass(request):
+    if request.method == 'GET':
+        course_list = []
+        courses=m.Course.objects.all()
+        for course in courses:
+            # Get all classes related to this course
+            classes=m.Class.objects.filter(course_id=course.course_id)
+            class_data = []
+            for cls in classes:
+                # Get timetables for this class
+                timetables=m.ClassTimetable.objects.filter(class_field_id=cls.class_id)
+                timetable_data = [
+                    {
+                        'day_of_week': t.day_of_week,
+                        'start_time': t.start_time,
+                        'end_time': t.end_time
+                    }
+                    for t in timetables
+                ]
+                class_data.append({
+                    'class_id': cls.class_id,
+                    'class_name': cls.class_name,
+                    'class_semester': cls.class_semester,
+                    'timetables': timetable_data
+                })
+            course_list.append({
+                'course_id': course.course_id,
+                'course_name': course.course_name,
+                'course_semester': course.course_semester,
+                'course_midterm_coeff': course.course_midterm_coeff,
+                'course_final_coeff': course.course_final_coeff,
+                'course_credit': course.course_credit,
+                'classes': class_data
+            })
+        return JsonResponse(course_list, safe=False)
 
 @csrf_exempt
 def CSVUploadCourse(request):
@@ -265,7 +303,7 @@ def CSVUploadCourse(request):
                 if isinstance(data.get('class_is_active'), str):
                     data['class_is_active'] = data['class_is_active'].strip().lower() in ['true', '1', 'yes']
 
-                serializer = CourseSerializer(data=data)
+                serializer=s.CourseSerializer(data=data)
                 if serializer.is_valid():
                     serializer.save()
                     success_count += 1
@@ -283,13 +321,13 @@ def CSVUploadCourse(request):
 @csrf_exempt
 def ReportAPI(request, user_id=0): #This post method is currently not available (but it still exists to insert values into the tables)
     if request.method == 'GET':
-        reports = Report.objects.filter(sender=user_id) if user_id != 0 else Report.objects.all()
-        serializer = ReportSerializer(reports, many=True)
+        reports=m.Report.objects.filter(sender=user_id) if user_id != 0 else m.Report.objects.all()
+        serializer=s.ReportSerializer(reports, many=True)
         return JsonResponse(serializer.data, safe=False)
     elif request.method == 'POST':
         reports_data = JSONParser().parse(request)
         # reports_data['sender'] = user.user_id  # Inject sender into the data
-        serializer = ReportSerializer(data=reports_data)
+        serializer=s.ReportSerializer(data=reports_data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse({"message": "Report submitted successfully"}, status=201)
@@ -298,26 +336,26 @@ def ReportAPI(request, user_id=0): #This post method is currently not available 
 @csrf_exempt
 def SemesterAPI(request, sem_id=0):
     if request.method == 'GET':
-        semesters = Semester.objects.all()
-        semesters_serializer = SemesterWithIDSerializer(semesters, many=True)
+        semesters=m.Semester.objects.all()
+        semesters_serializer=s.SemesterWithIDSerializer(semesters, many=True)
         return JsonResponse(semesters_serializer.data, safe=False)
     elif request.method == 'POST':
         semesters_data = JSONParser().parse(request)
-        semesters_serializer = SemesterSerializer(data=semesters_data)
+        semesters_serializer=s.SemesterSerializer(data=semesters_data)
         if semesters_serializer.is_valid():
             semesters_serializer.save()
             return JsonResponse({"message": "Semester created successfully"}, status=201)
         return JsonResponse(semesters_serializer.errors, status=400)
     elif request.method == 'PUT':
         semesters_data = JSONParser().parse(request)
-        semesters=Semester.objects.get(semester_id=sem_id)
-        semesters_serializer = SemesterSerializer(semesters, data=semesters_data)
+        semesters=m.Semester.objects.get(semester_id=sem_id)
+        semesters_serializer=s.SemesterSerializer(semesters, data=semesters_data)
         if semesters_serializer.is_valid():
             semesters_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse(semesters_serializer.errors, status=400)
     elif request.method == 'DELETE':
-        semesters=Semester.objects.get(semester_id=sem_id)
+        semesters=m.Semester.objects.get(semester_id=sem_id)
         semesters.delete()
         return JsonResponse({"message": "Semester deleted successfully"}, status=204)
 
@@ -325,63 +363,63 @@ def SemesterAPI(request, sem_id=0):
 def SemesterPatchAPI(request, sem_id=0):
     if request.method == 'PATCH':
         try:
-            semesters = Semester.objects.get(semester_id=sem_id)
+            semesters=m.Semester.objects.get(semester_id=sem_id)
             semesters.isActive = not semesters.isActive
             semesters.save()
             return JsonResponse("Cập nhật trạng thái thành công!", safe=False)
-        except Semester.DoesNotExist:
+        except m.Semester.DoesNotExist:
             return JsonResponse({"error": "Semester not found"}, status=404)
     
 @csrf_exempt
 def ParentAPI(request, pid=0):
     if request.method == 'GET':
-        parents=Parent.objects.all()
-        parents_serializer = ParentWithIDSerializer(parents,many=True)
+        parents=m.Parent.objects.all()
+        parents_serializer=s.ParentWithIDSerializer(parents,many=True)
         return JsonResponse(parents_serializer.data, safe=False)
     elif request.method == 'POST':
         parents_data=JSONParser().parse(request)
-        parents_serializer=ParentSerializer(data=parents_data)
+        parents_serializer=s.ParentSerializer(data=parents_data)
         if parents_serializer.is_valid():
             parents_serializer.save()
             return JsonResponse("Thêm bố/mẹ vào cơ sở dữ liệu thành công!",safe=False)
         return JsonResponse(parents_serializer.errors,safe=False)
     elif request.method == 'PUT':
         parents_data=JSONParser().parse(request)
-        parents=Parent.objects.get(parent_id = parents_data['parent_id'])
-        parents_serializer = ParentSerializer(parents, data=parents_data)
+        parents=m.Parent.objects.get(parent_id = parents_data['parent_id'])
+        parents_serializer=s.ParentSerializer(parents, data=parents_data)
         if parents_serializer.is_valid():
             parents_serializer.save()
             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
     elif request.method == 'DELETE':
-        parents=Parent.objects.get(parent_id=pid)
+        parents=m.Parent.objects.get(parent_id=pid)
         parents.delete()
         return JsonResponse("Xóa bố/mẹ thành công!",safe=False)
     
 @csrf_exempt
 def ClassTimetableAPI(request, sid=0):
     if request.method == 'GET':
-        class_ids = Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
-        classes = Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
+        class_ids=m.Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
+        classes=m.Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
 
-        serializer = ClassWithTimetableSerializer(classes, many=True)
+        serializer=s.ClassWithTimetableSerializer(classes, many=True)
         return JsonResponse(serializer.data, safe=False)
     
 @csrf_exempt
 def MessageAPI(request, user1_id, user2_id):
     if request.method == 'GET':
         try:
-            messages_user1_to_user2 = Message.objects.filter(
+            messages_user1_to_user2=m.Message.objects.filter(
                 sender_id=user1_id, receiver_id=user2_id
             )
             # Get messages from user2 to user1
-            messages_user2_to_user1 = Message.objects.filter(
+            messages_user2_to_user1=m.Message.objects.filter(
                 sender_id=user2_id, receiver_id=user1_id
             )
             # Combine the two querysets
             all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
 
-            serializer = MessageSerializer(all_messages, many=True)
+            serializer=s.MessageSerializer(all_messages, many=True)
             return JsonResponse(serializer.data)
 
         except Exception as e:
@@ -398,14 +436,14 @@ def MessageAPI(request, user1_id, user2_id):
             sender = Userlogin.objects.get(user_id=sender_id)
             receiver = Userlogin.objects.get(user_id=receiver_id)
 
-            message = Message.objects.create(
+            message=m.Message.objects.create(
                 sender=sender,
                 receiver=receiver,
                 content=content,
                 timestamp=timezone.now()
             )
 
-            message_serializer = MessageSerializer(message)
+            message_serializer=s.MessageSerializer(message)
             return JsonResponse(message_serializer.data, safe=False)
 
         except Userlogin.DoesNotExist:
@@ -435,11 +473,11 @@ def registrationAPI(request, course_id=0):
                 return JsonResponse({'error': 'No student profile associated with user.'}, status=400)
 
             # Check if course exists
-            if not Course.objects.filter(course_id=course_id).exists():
+            if not m.Course.objects.filter(course_id=course_id).exists():
                 return JsonResponse({'error': 'Course does not exist.'}, status=404)
 
             # Create Registration
-            registration, created = Registration.objects.get_or_create(
+            registration, created=m.Registration.objects.get_or_create(
                 student_id=student_id,
                 course_id=course_id
             )
@@ -468,11 +506,11 @@ def registrationAPI(request, course_id=0):
                 return JsonResponse({'error': 'No associated student found.'}, status=400)
 
             # Delete the registration
-            registration = Registration.objects.get(student_id=student_id, course_id=course_id)
+            registration=m.Registration.objects.get(student_id=student_id, course_id=course_id)
             registration.delete()
             return JsonResponse({'message': 'Course unregistered successfully.'}, status=200)
 
-        except Registration.DoesNotExist:
+        except m.Registration.DoesNotExist:
             return JsonResponse({'error': 'Registration does not exist.'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -480,10 +518,10 @@ def registrationAPI(request, course_id=0):
 @csrf_exempt
 def getSummaryAdmin(request):
     if request.method == 'GET':
-        total_students = Student.objects.count()
-        total_teachers = Teacher.objects.count()
-        total_parents = Parent.objects.count()
-        reports_pending = Report.objects.filter(status='Pending').count()
+        total_students = m.Student.objects.count()
+        total_teachers = m.Teacher.objects.count()
+        total_parents = m.Parent.objects.count()
+        reports_pending = m.Report.objects.filter(status='Pending').count()
 
         dashboard = {
             "totalStudents": total_students,

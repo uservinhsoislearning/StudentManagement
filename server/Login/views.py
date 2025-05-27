@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.hashers import check_password
 from django.utils.crypto import get_random_string
-from django.core.mail import EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 from rest_framework.parsers import JSONParser
