@@ -448,69 +448,74 @@ def MessageAPI(request, user1_id, user2_id):
             return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-def registrationAPI(request, course_id=0):
+def registrationAPI(request, course_id=0, class_id=0):
     if request.method == 'POST':
         try:
-            # Get useremail from session
             user_email = request.session.get('useremail')
             if not user_email:
                 return JsonResponse({'error': 'User not logged in.'}, status=401)
 
-            # Get Userlogin object
             user = Userlogin.objects.get(useremail=user_email)
-
-            # Ensure user is a student
             if user.usertype != 'student':
-                return JsonResponse({'error': 'Only students can register for courses.'}, status=403)
+                return JsonResponse({'error': 'Only students can register for classes.'}, status=403)
 
-            # Get related student_id from relatedid
             student_id = user.relatedid
             if not student_id:
                 return JsonResponse({'error': 'No student profile associated with user.'}, status=400)
 
-            # Check if course exists
-            if not m.Course.objects.filter(course_id=course_id).exists():
+            # Validate course
+            course = m.Course.objects.filter(course_id=course_id).first()
+            if not course:
                 return JsonResponse({'error': 'Course does not exist.'}, status=404)
 
+            # Validate class and check it belongs to the course
+            cls = m.Class.objects.filter(class_id=class_id, course_id=course_id).first()
+            if not cls:
+                return JsonResponse({'error': 'Class does not belong to this course or does not exist.'}, status=404)
+
             # Create Registration
-            registration, created=m.Registration.objects.get_or_create(
+            registration, created = m.Registration.objects.get_or_create(
                 student_id=student_id,
-                course_id=course_id
+                course_id=course_id,
+                class_field_id=class_id
             )
 
             if created:
                 return JsonResponse({'message': 'Registration successful.'}, status=201)
             else:
-                return JsonResponse({'message': 'Already registered for this course.'}, status=200)
+                return JsonResponse({'message': 'Already registered for this class.'}, status=200)
 
         except Userlogin.DoesNotExist:
             return JsonResponse({'error': 'Invalid user.'}, status=400)
+
     elif request.method == 'DELETE':
         try:
-            # Get useremail from session
             user_email = request.session.get('useremail')
             if not user_email:
                 return JsonResponse({'error': 'User not logged in.'}, status=401)
 
-            # Find user and check if they're a student
             user = Userlogin.objects.get(useremail=user_email)
             if user.usertype != 'student':
-                return JsonResponse({'error': 'Only students can unregister from courses.'}, status=403)
+                return JsonResponse({'error': 'Only students can unregister from classes.'}, status=403)
 
             student_id = user.relatedid
             if not student_id:
                 return JsonResponse({'error': 'No associated student found.'}, status=400)
 
-            # Delete the registration
-            registration=m.Registration.objects.get(student_id=student_id, course_id=course_id)
+            # Ensure the registration exists
+            registration = m.Registration.objects.get(
+                student_id=student_id,
+                course_id=course_id,
+                class_field_id=class_id
+            )
             registration.delete()
-            return JsonResponse({'message': 'Course unregistered successfully.'}, status=200)
+            return JsonResponse({'message': 'Class unregistered successfully.'}, status=200)
 
         except m.Registration.DoesNotExist:
             return JsonResponse({'error': 'Registration does not exist.'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
+        
 @csrf_exempt
 def getSummaryAdmin(request):
     if request.method == 'GET':

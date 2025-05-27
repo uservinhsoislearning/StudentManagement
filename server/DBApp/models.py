@@ -167,6 +167,7 @@ class Registration(models.Model):
     connect_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
     course = models.ForeignKey('Course', on_delete=models.CASCADE, db_column='course_id')
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
 
     class Meta:
         db_table = 'registration'
