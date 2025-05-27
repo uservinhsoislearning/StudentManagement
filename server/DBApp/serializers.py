@@ -197,7 +197,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = Registration
         fields = (
             'student',
-            'course'
+            'class_field'
         )
 
 class ReportSerializer(serializers.ModelSerializer):

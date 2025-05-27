@@ -448,7 +448,7 @@ def MessageAPI(request, user1_id, user2_id):
             return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-def registrationAPI(request, course_id=0, class_id=0):
+def registrationAPI(request, class_id=0):
     if request.method == 'POST':
         try:
             user_email = request.session.get('useremail')
@@ -463,21 +463,14 @@ def registrationAPI(request, course_id=0, class_id=0):
             if not student_id:
                 return JsonResponse({'error': 'No student profile associated with user.'}, status=400)
 
-            # Validate course
-            course = m.Course.objects.filter(course_id=course_id).first()
-            if not course:
-                return JsonResponse({'error': 'Course does not exist.'}, status=404)
+            # Check if class exists
+            if not m.Class.objects.filter(class_id=class_id).exists():
+                return JsonResponse({'error': 'Class does not exist.'}, status=404)
 
-            # Validate class and check it belongs to the course
-            cls = m.Class.objects.filter(class_id=class_id, course_id=course_id).first()
-            if not cls:
-                return JsonResponse({'error': 'Class does not belong to this course or does not exist.'}, status=404)
-
-            # Create Registration
+            # Register the student to the class
             registration, created = m.Registration.objects.get_or_create(
                 student_id=student_id,
-                course_id=course_id,
-                class_field_id=class_id
+                class_id=class_id
             )
 
             if created:
@@ -502,12 +495,7 @@ def registrationAPI(request, course_id=0, class_id=0):
             if not student_id:
                 return JsonResponse({'error': 'No associated student found.'}, status=400)
 
-            # Ensure the registration exists
-            registration = m.Registration.objects.get(
-                student_id=student_id,
-                course_id=course_id,
-                class_field_id=class_id
-            )
+            registration = m.Registration.objects.get(student_id=student_id, class_id=class_id)
             registration.delete()
             return JsonResponse({'message': 'Class unregistered successfully.'}, status=200)
 
