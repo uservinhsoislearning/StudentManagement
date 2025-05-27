@@ -7,10 +7,6 @@ from django.utils import timezone
 import pandas as pd
 import DBApp.models as m
 import DBApp.serializers as s
-# from DBApp.models import Class, Enrollment, Assignment, Parent, Registration
-# from DBApp.serializers import ClassSerializer, ClassWithIDSerializer, ClassWithCourseSerializer, EnrollmentSerializer, EnrollmentGradeSerializer, EnrollmentGradeSubjectSerializer, AssignmentSerializer, ParentSerializer, ParentWithIDSerializer, CourseWithIDSerializer
-# from DBApp.models import Teacher,Student, Course, Report, Semester, Message
-# from DBApp.serializers import TeacherSerializer,StudentSerializer, StudentWithIDSerializer, CourseSerializer, ReportSerializer, SemesterSerializer, ClassWithTimetableSerializer, TeacherWithIDSerializer, MessageSerializer, SemesterWithIDSerializer, CourseClassSerializer
 from Login.models import Userlogin
 
 @csrf_exempt
@@ -163,7 +159,7 @@ def getGradeStudent(request, sid=0):
 def AssignmentAPI(request, id=0):
     if request.method == 'GET':
         assignments=m.Assignment.objects.filter(class_field = id)
-        assignments_serializer=s.AssignmentSerializer(assignments,many=True)
+        assignments_serializer=s.AssignmentWithIDSerializer(assignments,many=True)
         return JsonResponse(assignments_serializer.data, safe=False)
     elif request.method == 'POST':
         assignments_data=JSONParser().parse(request)

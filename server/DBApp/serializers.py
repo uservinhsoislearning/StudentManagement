@@ -7,6 +7,11 @@ class AdminSerializer(serializers.ModelSerializer):
         model = Admin
         fields = '__all__'
 
+class AssignmentWithIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
