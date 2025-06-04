@@ -315,4 +315,3 @@ class Work(models.Model):
 
     class Meta:
         db_table = 'work'
-        unique_together = ('assignment', 'student')
