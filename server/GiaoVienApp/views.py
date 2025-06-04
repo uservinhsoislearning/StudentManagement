@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
 
-from DBApp.models import Enrollment, Class, Student, Studentparent, Work
+from DBApp.models import Enrollment, Class, Student, Studentparent, Work, ClassTimetable
 from DBApp.serializers import EnrollmentSerializer, WorkScoreSerializer
 
 import server.settings as settings
@@ -176,3 +176,26 @@ def getClassStats(request, cid=0):
         }
 
         return JsonResponse(data=grade_data, safe=False)
+
+@csrf_exempt
+def getMoreDetails(request, cid=0):
+    if request.method == 'GET':
+        try:
+            # Get the class and related course name
+            class_obj = Class.objects.select_related('course').get(class_id=cid)
+            course_name = class_obj.course.course_name
+
+            # Get timetable entries
+            timetables = ClassTimetable.objects.filter(class_field=class_obj).values(
+                'day_of_week', 'start_time', 'end_time'
+            )
+
+            # Format the response
+            schedule = list(timetables)
+            return JsonResponse({
+                'course_name': course_name,
+                'schedule': schedule
+            })
+
+        except Class.DoesNotExist:
+            return JsonResponse({'error': 'Class not found'}, status=404)

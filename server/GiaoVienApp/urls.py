@@ -9,5 +9,7 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<cid>\d+)/send-attendance$', views.sendAttendance),
 
-    re_path(r'^api/classes/(?P<cid>\d+)/statistics', views.getClassStats)
+    re_path(r'^api/classes/(?P<cid>\d+)/statistics', views.getClassStats),
+
+    re_path(r'^api/classes/(?P<cid>\d+)/details', views.getMoreDetails)
 ]
