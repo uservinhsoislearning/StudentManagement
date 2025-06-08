@@ -4,10 +4,13 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
-from django.db.models import Avg, Max, Min
+from django.db.models import Avg, Max, Min, F
 from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.db.models import OuterRef, Subquery
+from django.db.models.functions import Abs
+from datetime import timedelta
 
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
@@ -43,8 +46,21 @@ def EnrollmentScoreAPI(request, class_id=0, student_id=0):
 @csrf_exempt
 def AttendanceRecordAPI(request, cid=0, sid=0):
     if request.method == 'GET':
-        attendance=Attendance.objects.filter(class_field_id=cid,timestamp__date=timezone.now().date())
-        attendance_serializer=AttendanceSerializer(attendance,many=True)
+        # Find the closest attendance date for this class
+        closest = (
+            Attendance.objects.filter(class_field_id=cid)
+            .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
+            .order_by('date_diff')
+            .values('timestamp__date')
+            .first()
+        )
+
+        if not closest:
+            return JsonResponse([], safe=False)
+
+        closest_date = closest['timestamp__date']
+        attendance = Attendance.objects.filter(class_field_id=cid, timestamp__date=closest_date)
+        attendance_serializer = AttendanceSerializer(attendance, many=True)
         return JsonResponse(attendance_serializer.data, safe=False)
     elif request.method == 'POST':
         try:
@@ -74,28 +90,52 @@ def AttendanceRecordAPI(request, cid=0, sid=0):
             return JsonResponse({"error": str(e)}, status=500)
     elif request.method == 'PATCH':
         try:
-            record = Attendance.objects.get(student=sid, class_field_id=cid, timestamp__date=timezone.now().date())
-            record.is_present = not record.is_present
-            record.save()
-            return JsonResponse({"message": "Student marked as present."}) if record.is_present == True else JsonResponse({"message": "Student marked as NOT present."})
-        except Attendance.DoesNotExist:
-            return JsonResponse({"error": "Attendance record not found."}, status=404)
+            # Find closest date with a record for this class + student
+            closest = (
+                Attendance.objects.filter(class_field_id=cid, student=sid)
+                .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
+                .order_by('date_diff')
+                .first()
+            )
+
+            if not closest:
+                return JsonResponse({"error": "Attendance record not found."}, status=404)
+
+            closest.is_present = not closest.is_present
+            closest.save()
+
+            return JsonResponse({"message": "Student marked as present."}) if closest.is_present else JsonResponse({"message": "Student marked as NOT present."})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
         
 @csrf_exempt
 def sendAttendance(request, cid=0):
     if request.method == 'POST':
         try:
-            today = timezone.now().date()
+            # Step 1: Find the closest date attendance record for this class
+            closest = (
+                Attendance.objects.filter(class_field_id=cid)
+                .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
+                .order_by('date_diff')
+                .values('timestamp__date')
+                .first()
+            )
 
-            # Get today's attendance records for the class where students are absent
+            if not closest:
+                return JsonResponse({"error": "Không có bản ghi điểm danh nào để gửi!"}, status=404)
+
+            closest_date = closest['timestamp__date']
+
+            # Step 2: Filter absent students on that closest date
             absent_records = Attendance.objects.filter(
                 class_field_id=cid,
-                timestamp__date=today,
+                timestamp__date=closest_date,
                 is_present=False
             )
 
             if not absent_records.exists():
-                return JsonResponse("Không có học sinh nào vắng hôm nay!", safe=False)
+                return JsonResponse("Không có học sinh nào vắng vào ngày gần nhất!", safe=False)
 
             emails_sent = []
 
@@ -103,33 +143,42 @@ def sendAttendance(request, cid=0):
                 try:
                     sid = record.student
                     student = Student.objects.get(student_id=sid)
-                    dummy = Studentparent.objects.filter(student=sid)
+                    parents = Studentparent.objects.filter(student=sid)
                     class_data = Class.objects.get(class_id=cid)
-                    teacher=class_data.class_teacher
-                    for dum in dummy:
-                        p = dum.parent
+                    teacher = class_data.class_teacher
+
+                    for relation in parents:
+                        parent = relation.parent
                         subject = "Thông báo vắng mặt"
 
                         html_message = render_to_string('absent.html', {
                             'student_name': student.student_name,
                             'class_name': class_data.class_name,
-                            'date': today,
+                            'date': closest_date,
                             'teacher_email': teacher.teacher_email
                         })
-                        plain_message = f"Học sinh {student.student_name} đã vắng mặt buổi học hôm nay ({today}), lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
-                        from_email = settings.EMAIL_HOST_USER
-                        to_email = [p.parent_email]
 
-                        # Send email with HTML and plain fallback
+                        plain_message = (
+                            f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
+                            f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
+                        )
+
+                        from_email = settings.EMAIL_HOST_USER
+                        to_email = [parent.parent_email]
+
                         email = EmailMultiAlternatives(subject, plain_message, from_email, to_email)
                         email.attach_alternative(html_message, "text/html")
                         email.send()
-                        emails_sent.append(p.parent_email)
-                except Exception as e:
-                    print(f"Error processing {e}")
-                    continue  
+                        emails_sent.append(parent.parent_email)
 
-            return JsonResponse({"message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!", "recipients": emails_sent})
+                except Exception as e:
+                    print(f"Error processing student ID {record.student}: {e}")
+                    continue
+
+            return JsonResponse({
+                "message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!",
+                "recipients": emails_sent
+            })
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
@@ -202,6 +251,7 @@ def getMoreDetails(request, cid=0):
         
 @csrf_exempt
 def getSummaryTeacher(request, tid=0):
-    teacher = Teacher.objects.get(teacher_id=tid)
-    teacher_serializer = TeacherWithIDSerializer(teacher)
-    return JsonResponse(teacher_serializer.data, safe=False)
+    if request.method == "GET":
+        teacher = Teacher.objects.get(teacher_id=tid)
+        teacher_serializer = TeacherWithIDSerializer(teacher)
+        return JsonResponse(teacher_serializer.data, safe=False)

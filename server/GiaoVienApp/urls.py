@@ -13,5 +13,7 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<cid>\d+)/details$', views.getMoreDetails),
 
-    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher)
+    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
+
+    re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', views.gradeWorkAPI)
 ]
