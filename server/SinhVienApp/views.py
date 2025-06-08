@@ -16,13 +16,21 @@ def submitWork(request, cid=0, aid=0, sid=0):
         work_serializer = WorkScoreSerializer(work, many=True)
         return JsonResponse(work_serializer.data, safe=False)
     elif request.method == 'POST':
-        work_data = JSONParser().parse(request)
+        if request.content_type.startswith("multipart/form-data"):
+            work_data = {
+                "class_field": cid,
+                "assignment": aid,
+                "student": sid,
+                "text_content": request.POST.get("text_content", ""),
+                "file": request.FILES.get("file")
+            }
+        else:
+            work_data = JSONParser().parse(request)
+            work_data["class_field"] = cid
+            work_data["assignment"] = aid
+            work_data["student"] = sid
 
-        work_data['class_field'] = cid
-        work_data['assignment'] = aid
-        work_data['student'] = sid
-
-        work_serializer=WorkSerializer(data=work_data)
+        work_serializer = WorkSerializer(data=work_data)
         if work_serializer.is_valid():
             work_serializer.save()
             return JsonResponse("Gửi bài tập thành công!", safe=False)
