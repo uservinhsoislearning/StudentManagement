@@ -12,8 +12,8 @@ from django.template.loader import render_to_string
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
 
-from DBApp.models import Enrollment, Class, Student, Studentparent, Work, ClassTimetable
-from DBApp.serializers import EnrollmentSerializer, WorkScoreSerializer
+from DBApp.models import Enrollment, Class, Student, Studentparent, Work, ClassTimetable, Teacher
+from DBApp.serializers import EnrollmentSerializer, WorkScoreSerializer, TeacherWithIDSerializer
 
 import server.settings as settings
 
@@ -199,3 +199,9 @@ def getMoreDetails(request, cid=0):
 
         except Class.DoesNotExist:
             return JsonResponse({'error': 'Class not found'}, status=404)
+        
+@csrf_exempt
+def getSummaryTeacher(request, tid=0):
+    teacher = Teacher.objects.get(teacher_id=tid)
+    teacher_serializer = TeacherWithIDSerializer(teacher)
+    return JsonResponse(teacher_serializer.data, safe=False)

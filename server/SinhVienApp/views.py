@@ -5,8 +5,8 @@ from django.http.response import JsonResponse
 
 from django.utils import timezone
 
-from DBApp.models import Enrollment, Assignment, Work
-from DBApp.serializers import WorkSerializer, WorkScoreSerializer
+from DBApp.models import Enrollment, Assignment, Work, Parent
+from DBApp.serializers import WorkSerializer, WorkScoreSerializer, ParentWithIDSerializer
 
 # Create your views here.
 @csrf_exempt
@@ -69,3 +69,11 @@ def getSummaryStudent(request, sid=0):
     }
 
     return JsonResponse(dashboard, safe=False)
+
+@csrf_exempt
+def getSummaryParent(request, pid=0):
+    if request.method == "GET":
+        parent = Parent.objects.get(parent_id=pid)
+        parent_serializer = ParentWithIDSerializer(parent)
+        return JsonResponse(parent_serializer.data, safe=False)
+    
