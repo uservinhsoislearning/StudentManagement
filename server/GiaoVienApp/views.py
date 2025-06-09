@@ -5,12 +5,11 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 from django.db.models import Avg, Max, Min, F
-from django.utils import timezone
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.db.models import OuterRef, Subquery
 from django.db.models.functions import Abs
-from datetime import timedelta
+from django.db.models import F, ExpressionWrapper, DurationField, IntegerField
+from django.db.models.functions import Now, Extract
 
 from GiaoVienApp.models import Attendance
 from GiaoVienApp.serializers import AttendanceSerializer
@@ -46,11 +45,18 @@ def EnrollmentScoreAPI(request, class_id=0, student_id=0):
 @csrf_exempt
 def AttendanceRecordAPI(request, cid=0, sid=0):
     if request.method == 'GET':
-        # Find the closest attendance date for this class
         closest = (
             Attendance.objects.filter(class_field_id=cid)
-            .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
-            .order_by('date_diff')
+            .annotate(
+                time_diff=ExpressionWrapper(
+                    Now() - F('timestamp'),
+                    output_field=DurationField()
+                )
+            )
+            .annotate(
+                seconds_diff=Extract(F('time_diff'), 'epoch')
+            )
+            .order_by('seconds_diff')
             .values('timestamp__date')
             .first()
         )
@@ -62,19 +68,16 @@ def AttendanceRecordAPI(request, cid=0, sid=0):
         attendance = Attendance.objects.filter(class_field_id=cid, timestamp__date=closest_date)
         attendance_serializer = AttendanceSerializer(attendance, many=True)
         return JsonResponse(attendance_serializer.data, safe=False)
+
     elif request.method == 'POST':
         try:
-            # Validate class existence
             if not Class.objects.filter(class_id=cid).exists():
                 return JsonResponse({"error": "Lớp không tồn tại!"}, status=404)
 
-            # Get all enrollments for this class
             enrollments = Enrollment.objects.filter(class_field_id=cid)
-
             if not enrollments.exists():
                 return JsonResponse({"error": "Không có học sinh nào trong lớp này!"}, status=404)
 
-            # Create attendance records for each student
             created_records = []
             for enrollment in enrollments:
                 attendance = Attendance.objects.create(
@@ -88,13 +91,21 @@ def AttendanceRecordAPI(request, cid=0, sid=0):
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
     elif request.method == 'PATCH':
         try:
-            # Find closest date with a record for this class + student
             closest = (
                 Attendance.objects.filter(class_field_id=cid, student=sid)
-                .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
-                .order_by('date_diff')
+                .annotate(
+                    time_diff=ExpressionWrapper(
+                        Now() - F('timestamp'),
+                        output_field=DurationField()
+                    )
+                )
+                .annotate(
+                    seconds_diff=Extract(F('time_diff'), 'epoch')
+                )
+                .order_by('seconds_diff')
                 .first()
             )
 
@@ -105,19 +116,27 @@ def AttendanceRecordAPI(request, cid=0, sid=0):
             closest.save()
 
             return JsonResponse({"message": "Student marked as present."}) if closest.is_present else JsonResponse({"message": "Student marked as NOT present."})
+
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-        
+
 @csrf_exempt
 def sendAttendance(request, cid=0):
     if request.method == 'POST':
         try:
-            # Step 1: Find the closest date attendance record for this class
             closest = (
                 Attendance.objects.filter(class_field_id=cid)
-                .annotate(date_diff=Abs(F('timestamp__date') - timezone.now().date()))
-                .order_by('date_diff')
+                .annotate(
+                    time_diff=ExpressionWrapper(
+                        Now() - F('timestamp'),
+                        output_field=DurationField()
+                    )
+                )
+                .annotate(
+                    seconds_diff=Extract(F('time_diff'), 'epoch')
+                )
+                .order_by('seconds_diff')
                 .values('timestamp__date')
                 .first()
             )
@@ -127,7 +146,6 @@ def sendAttendance(request, cid=0):
 
             closest_date = closest['timestamp__date']
 
-            # Step 2: Filter absent students on that closest date
             absent_records = Attendance.objects.filter(
                 class_field_id=cid,
                 timestamp__date=closest_date,
