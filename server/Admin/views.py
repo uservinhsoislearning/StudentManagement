@@ -461,29 +461,21 @@ def MessageAPI(request, user1_id, user2_id):
             return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
-def registrationAPI(request, class_id=0):
+def registrationAPI(request, sid=0, cid=0):
     if request.method == 'POST':
         try:
-            user_email = request.session.get('useremail')
-            if not user_email:
-                return JsonResponse({'error': 'User not logged in.'}, status=401)
+            # Validate student existence
+            if not m.Student.objects.filter(student_id=sid).exists():
+                return JsonResponse({'error': 'Student does not exist.'}, status=404)
 
-            user = Userlogin.objects.get(useremail=user_email)
-            if user.usertype != 'student':
-                return JsonResponse({'error': 'Only students can register for classes.'}, status=403)
-
-            student_id = user.relatedid
-            if not student_id:
-                return JsonResponse({'error': 'No student profile associated with user.'}, status=400)
-
-            # Check if class exists
-            if not m.Class.objects.filter(class_id=class_id).exists():
+            # Validate class existence
+            if not m.Class.objects.filter(class_id=cid).exists():
                 return JsonResponse({'error': 'Class does not exist.'}, status=404)
 
             # Register the student to the class
             registration, created = m.Registration.objects.get_or_create(
-                student_id=student_id,
-                class_id=class_id
+                student_id=sid,
+                class_id=cid
             )
 
             if created:
@@ -491,24 +483,16 @@ def registrationAPI(request, class_id=0):
             else:
                 return JsonResponse({'message': 'Already registered for this class.'}, status=200)
 
-        except Userlogin.DoesNotExist:
-            return JsonResponse({'error': 'Invalid user.'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     elif request.method == 'DELETE':
         try:
-            user_email = request.session.get('useremail')
-            if not user_email:
-                return JsonResponse({'error': 'User not logged in.'}, status=401)
+            # Validate student existence
+            if not m.Student.objects.filter(student_id=sid).exists():
+                return JsonResponse({'error': 'Student does not exist.'}, status=404)
 
-            user = Userlogin.objects.get(useremail=user_email)
-            if user.usertype != 'student':
-                return JsonResponse({'error': 'Only students can unregister from classes.'}, status=403)
-
-            student_id = user.relatedid
-            if not student_id:
-                return JsonResponse({'error': 'No associated student found.'}, status=400)
-
-            registration = m.Registration.objects.get(student_id=student_id, class_id=class_id)
+            registration = m.Registration.objects.get(student_id=sid, class_id=cid)
             registration.delete()
             return JsonResponse({'message': 'Class unregistered successfully.'}, status=200)
 
