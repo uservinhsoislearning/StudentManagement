@@ -204,12 +204,26 @@ def sendAttendance(request, cid=0):
 @csrf_exempt
 def gradeWorkAPI(request,cid=0,sid=0,aid=0):
     if request.method == 'PUT':
-        work_data = JSONParser().parse(request)
-        work_serializer = WorkScoreSerializer(data={'score': work_data['score']}, partial=True)
-        if work_serializer.is_valid():
-            work_serializer.save()
-            return JsonResponse(work_serializer.data, safe=False)
-        return JsonResponse(work_serializer.errors, status=400)
+        try:
+            # Step 1: Parse request data
+            work_data = JSONParser().parse(request)
+
+            # Step 2: Find the specific Work record
+            work_instance = Work.objects.get(class_field_id=cid, student_id=sid, assignment_id=aid)
+
+            # Step 3: Create serializer and update score
+            work_serializer = WorkScoreSerializer(work_instance, data={'score': work_data['score']}, partial=True)
+
+            if work_serializer.is_valid():
+                work_serializer.save()
+                return JsonResponse(work_serializer.data, safe=False)
+            else:
+                return JsonResponse(work_serializer.errors, status=400)
+
+        except Work.DoesNotExist:
+            return JsonResponse({'error': 'Work entry not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
     # DELETE request: delete the work entry
     elif request.method == 'DELETE':
