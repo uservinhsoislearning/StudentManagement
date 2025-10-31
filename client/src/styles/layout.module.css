@@ -1,0 +1,43 @@
+.container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar dùng class quản lý chiều rộng */
+.sidebar {
+  background: #1f2937;
+  color: white;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+  z-index: 100;
+}
+
+.sidebar.expanded {
+  width: 220px;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.mainContent {
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.mainContent.expanded {
+  margin-left: 220px;
+}
+
+.mainContent.collapsed {
+  margin-left: 60px;
+}

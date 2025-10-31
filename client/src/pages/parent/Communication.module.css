@@ -1,0 +1,29 @@
+.container {
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #222;
+}
+
+.messageBox {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    border-left: 4px solid #3b82f6;
+}
+
+.sender {
+    font-weight: 600;
+    margin-right: 6px;
+}

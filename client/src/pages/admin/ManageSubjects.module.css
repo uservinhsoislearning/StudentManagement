@@ -1,0 +1,61 @@
+/* ManageSubjects.module.css */
+.container {
+    animation: fadeIn 0.4s ease-in-out;
+    padding: 24px;
+}
+
+.header {
+    background: #f3f4f6;
+    padding: 16px 24px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin: 0;
+}
+
+.header p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.previewSection {
+    margin-top: 30px;
+    animation: fadeInUp 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

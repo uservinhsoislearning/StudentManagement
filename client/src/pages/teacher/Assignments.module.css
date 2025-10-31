@@ -1,0 +1,19 @@
+.formRow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 cột đều nhau */
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+.checkboxGroup {
+    display: grid;
+    align-items: center;
+    gap: 8px;
+}
+
+.buttonFullWidth {
+    width: 100%;
+    height: 40px;
+}

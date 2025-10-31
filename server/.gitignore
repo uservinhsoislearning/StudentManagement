@@ -1,6 +1,5 @@
 DBINFO.py
 testAccInfo.txt
-.vscode/
 
 *.pyc
 __pycache__/

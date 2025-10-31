@@ -1,0 +1,83 @@
+/* Quản lý layout tổng thể */
+.container {
+    animation: fadeSlideIn 0.4s ease;
+    padding: 20px;
+    background-color: #f9fafb;
+}
+
+/* Header */
+.header {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    background: linear-gradient(to right, #3b82f6, #2563eb);
+    color: white;
+    animation: fadeSlideIn 0.5s ease;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Animation xuất hiện */
+@keyframes fadeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bảng và phần import */
+.tableWrapper {
+    margin-top: 24px;
+    animation: fadeSlideIn 0.4s ease;
+}
+
+.excelPreview {
+    background-color: #fff;
+    padding: 16px;
+    border: 1px dashed #3b82f6;
+    border-radius: 10px;
+    margin-top: 24px;
+}
+
+/* Form tạo lớp học mới */
+.createClassForm {
+    border: 1px solid #e5e7eb;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    animation: fadeSlideIn 0.3s ease;
+}
+
+.createClassForm h4 {
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+/* Hiển thị tất cả lớp học */
+.classList {
+    margin-top: 32px;
+    animation: fadeSlideIn 0.5s ease;
+}
+
+.classList h4 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    color: #1e293b;
+}

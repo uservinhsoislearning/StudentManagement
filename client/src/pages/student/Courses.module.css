@@ -1,0 +1,55 @@
+.container {
+    padding: 20px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.courseName {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.status {
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.status.completed {
+    background-color: #d1f5d3;
+    color: #2e7d32;
+}
+
+.status.ongoing {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status.pending {
+    background-color: #f8d7da;
+    color: #721c24;
+}

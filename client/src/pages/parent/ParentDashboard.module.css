@@ -1,0 +1,20 @@
+.container {
+    padding: 24px;
+}
+
+.heading {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: #f8f9fa;
+    padding: 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.error {
+    color: red;
+}
