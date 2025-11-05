@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'GiaoVienApp.apps.GiaovienappConfig',
     'Admin.apps.AdminConfig',
     'Login.apps.LoginConfig',
-    'DBApp'
+    'DBApp.apps.DbappConfig'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True # Không tốt khi chạy production 
