@@ -21,8 +21,8 @@ from django.urls import re_path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^',include('Admin.urls')),
-    re_path(r'^',include('Login.urls')),
-    re_path(r'^',include('GiaoVienApp.urls')),
-    re_path(r'^',include('SinhVienApp.urls'))
+    # re_path(r'^',include('Admin.urls')),
+    # re_path(r'^',include('Login.urls')),
+    # re_path(r'^',include('GiaoVienApp.urls')),
+    re_path(r'^',include('MainApp.urls'))
 ]

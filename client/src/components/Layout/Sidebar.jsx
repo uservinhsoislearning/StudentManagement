@@ -97,6 +97,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
           <NavLink
             key={item.path}
             to={item.path}
+            end
             className={({ isActive }) => (isActive ? styles.active : styles.link)}
             style={{
               display: "flex",

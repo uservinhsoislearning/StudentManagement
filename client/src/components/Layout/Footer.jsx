@@ -12,7 +12,7 @@ const Footer = () => {
     >
       <p>
         © {new Date().getFullYear()}{" "}
-        <strong style={{ color: "#2563eb" }}>BK Student System</strong> — All rights reserved.
+        <strong style={{ color: "#b22222" }}>BK Student System</strong> — All rights reserved.
       </p>
     </footer>
   );

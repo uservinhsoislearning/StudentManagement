@@ -40,11 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'SinhVienApp.apps.SinhvienappConfig',
-    'GiaoVienApp.apps.GiaovienappConfig',
-    'Admin.apps.AdminConfig',
-    'Login.apps.LoginConfig',
-    'DBApp.apps.DbappConfig'
+    # 'SinhVienApp.apps.SinhvienappConfig',
+    # 'GiaoVienApp.apps.GiaovienappConfig',
+    # 'Admin.apps.AdminConfig',
+    # 'Login.apps.LoginConfig',
+    'MainApp.apps.MainappConfig'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True # Không tốt khi chạy production 

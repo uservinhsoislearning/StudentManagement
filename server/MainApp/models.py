@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
+from django.contrib.auth.hashers import make_password
 
 from django.utils import timezone
 import os
@@ -38,6 +39,16 @@ class Assignment(models.Model):
     
     class Meta:
         db_table = 'assignment'
+
+class Attendance(models.Model):
+    session_id = models.AutoField(primary_key=True)
+    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+    student = models.IntegerField()
+    is_present = models.BooleanField(default=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'attendance'
 
 class Class(models.Model):
     class_id = models.AutoField(primary_key=True)
@@ -134,12 +145,12 @@ class Message(models.Model):
     message_id = models.AutoField(primary_key=True)
 
     sender = models.ForeignKey(
-        'Login.Userlogin',
+        'Userlogin',
         on_delete=models.CASCADE,
         related_name='sent_messages'
     )
     receiver = models.ForeignKey(
-        'Login.Userlogin',
+        'Userlogin',
         on_delete=models.CASCADE,
         related_name='received_messages'
     )
@@ -188,7 +199,7 @@ class Report(models.Model):
     )
 
     sender = models.ForeignKey(
-        'Login.Userlogin',
+        'Userlogin',
         on_delete=models.SET_NULL,
         db_column='sender_id',
         null=True,
@@ -285,6 +296,23 @@ class CourseTeacher(models.Model):
 
 def work_upload_path(instance, filename):
     return os.path.join('works', f"assignment_{instance.assignment.assignment_id}", f"student_{instance.student.student_id}", filename)
+
+class Userlogin(models.Model):
+    user_id = models.AutoField(primary_key=True)
+    username = models.CharField(unique=True, max_length=255)
+    password = models.CharField(max_length=255)
+    useremail = models.CharField(unique=True, max_length=255)
+    usertype = models.CharField(max_length=50)
+    relatedid = models.IntegerField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Hash mat khau
+        if not self.password.startswith('pbkdf2_'):
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'userlogin'
 
 class Work(models.Model):
     work_id = models.AutoField(primary_key=True)

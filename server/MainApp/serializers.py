@@ -1,20 +1,28 @@
 from rest_framework import serializers
-from .models import Admin, Parent, Student, Studentparent, Teacher, Course, Report, Semester, Assignment, Class, Enrollment, Work, ClassTimetable, Message, Registration
-from Login.serializers import UserloginSerializer
+from MainApp import models as m
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Admin
+        model = m.Admin
         fields = '__all__'
+
+class AttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = m.Attendance
+        fields = (
+            'class_field',
+            'student',
+            'is_present'
+        )
 
 class AssignmentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Assignment
+        model = m.Assignment
         fields = '__all__'
 
 class AssignmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Assignment
+        model = m.Assignment
         fields = (
             'text_content',
             'file',
@@ -25,7 +33,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class TeacherSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Teacher
+        model = m.Teacher
         fields = (
             'teacher_name',
             'teacher_gender',
@@ -34,10 +42,10 @@ class TeacherSerializer(serializers.ModelSerializer):
         )
 
 class ClassWithCourseSerializer(serializers.ModelSerializer):
-    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=m.Teacher.objects.all()) # Nested serialization
 
     class Meta:
-        model = Class
+        model = m.Class
         fields = (
             'class_name',
             'class_teacher',
@@ -46,10 +54,10 @@ class ClassWithCourseSerializer(serializers.ModelSerializer):
         )
 
 class ClassWithIDSerializer(serializers.ModelSerializer):
-    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=m.Teacher.objects.all())
 
     class Meta:
-        model = Class
+        model = m.Class
         fields = (
             'class_id',
             'class_name',
@@ -60,7 +68,7 @@ class ClassWithIDSerializer(serializers.ModelSerializer):
 class TeacherWithIDSerializer(serializers.ModelSerializer):
     classes = ClassWithIDSerializer(source='class_set', many=True)
     class Meta:
-        model = Teacher
+        model = m.Teacher
         fields = (
             'teacher_id',
             'teacher_name',
@@ -71,10 +79,10 @@ class TeacherWithIDSerializer(serializers.ModelSerializer):
         )
 
 class ClassSerializer(serializers.ModelSerializer):
-    class_teacher = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all()) # Nested serialization
+    class_teacher = serializers.PrimaryKeyRelatedField(queryset=m.Teacher.objects.all()) # Nested serialization
 
     class Meta:
-        model = Class
+        model = m.Class
         fields = (
             'class_name',
             'class_teacher',
@@ -83,7 +91,7 @@ class ClassSerializer(serializers.ModelSerializer):
 
 class ClassTimetableSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ClassTimetable
+        model = m.ClassTimetable
         fields = (
             'day_of_week',
             'start_time',
@@ -94,17 +102,17 @@ class ClassWithTimetableSerializer(serializers.ModelSerializer):
     timetables = ClassTimetableSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Class
+        model = m.Class
         fields = ('class_id', 'class_name', 'class_teacher', 'class_semester', 'timetables')
 
 class CourseWithIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
+        model = m.Course
         fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
+        model = m.Course
         fields = (
             'course_name', 
             'course_semester',
@@ -115,12 +123,12 @@ class CourseSerializer(serializers.ModelSerializer):
 
 class StudentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Student
+        model = m.Student
         fields = '__all__'
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Student
+        model = m.Student
         fields = (
             'student_name',
             'student_dob',
@@ -136,7 +144,7 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Enrollment
+        model = m.Enrollment
         fields = (
             'class_field',
             'student',
@@ -148,7 +156,7 @@ class EnrollmentSerializer(serializers.ModelSerializer):
 
 class EnrollmentGradeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Enrollment
+        model = m.Enrollment
         fields = (
             'student',
             'midterm',
@@ -158,7 +166,7 @@ class EnrollmentGradeSerializer(serializers.ModelSerializer):
 
 class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Enrollment
+        model = m.Enrollment
         fields = (
             'student',
             'class_field',
@@ -167,23 +175,14 @@ class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
             'grade'
         )
 
-
-class MessageSerializer(serializers.ModelSerializer):
-    sender = UserloginSerializer(read_only=True)
-    receiver = UserloginSerializer(read_only=True)
-
-    class Meta:
-        model = Message
-        fields = ['message_id', 'sender', 'receiver', 'content', 'timestamp', 'is_read']
-
 class ParentWithIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Parent
+        model = m.Parent
         fields = '__all__'
 
 class ParentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Parent
+        model = m.Parent
         fields = (
             'parent_name',
             'parent_gender',
@@ -194,7 +193,7 @@ class ParentSerializer(serializers.ModelSerializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Registration
+        model = m.Registration
         fields = (
             'student',
             'class_field'
@@ -202,7 +201,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Report
+        model = m.Report
         fields = (
             'type_of_bug',
             'description',
@@ -212,12 +211,12 @@ class ReportSerializer(serializers.ModelSerializer):
 
 class SemesterWithIDSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Semester
+        model = m.Semester
         fields = '__all__'
 
 class SemesterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Semester
+        model = m.Semester
         fields = (
             'name',
             'startDate',
@@ -227,7 +226,7 @@ class SemesterSerializer(serializers.ModelSerializer):
 
 class StudentparentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Studentparent
+        model = m.Studentparent
         fields = (
             'student',
             'relationship_to_student',
@@ -236,7 +235,7 @@ class StudentparentSerializer(serializers.ModelSerializer):
 
 class WorkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Work
+        model = m.Work
         fields = (
             'assignment',
             'student',
@@ -248,9 +247,28 @@ class WorkSerializer(serializers.ModelSerializer):
 
 class WorkScoreSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Work
+        model = m.Work
         fields = (
             'text_content',
             'file',
             'score'
         )
+
+class UserloginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = m.Userlogin
+        fields=(
+            'username',
+            'password',
+            'useremail',
+            'usertype',
+            'relatedid'
+        )
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserloginSerializer(read_only=True)
+    receiver = UserloginSerializer(read_only=True)
+
+    class Meta:
+        model = m.Message
+        fields = ['message_id', 'sender', 'receiver', 'content', 'timestamp', 'is_read']
