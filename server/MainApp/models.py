@@ -222,14 +222,13 @@ class Semester(models.Model):
 class Student(models.Model):
     student_id = models.AutoField(primary_key=True)
     student_name = models.CharField(max_length=255, blank=True, null=True)
-    student_dob = models.DateTimeField(blank=True, null=True)
+    student_dob = models.DateField(blank=True, null=True)
     student_gender = models.CharField(max_length=50, blank=True, null=True)
     student_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
     parent_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    student_phone_number = models.CharField(max_length=20, blank=True, null=True)
+    student_phone_number = models.CharField(max_length=12, blank=True, null=True)
     student_specialization = models.CharField(max_length=255, blank=True, null=True)
     student_is_active = models.BooleanField(blank=True, null=True)
-    student_school = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         db_table = 'student'
