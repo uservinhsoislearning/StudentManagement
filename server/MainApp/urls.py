@@ -1,9 +1,10 @@
 from django.urls import re_path
 from MainApp import views
+from . import controllers
 
 urlpatterns = [
-    re_path(r'^api/students$', views.studentAPI),
-    re_path(r'^api/students/([0-9]+)$', views.studentAPI),
+    re_path(r'^api/students$', controllers.studentAPI.StudentController.as_view()),
+    re_path(r'^api/students/(?P<sid>\d+)$', controllers.studentAPI.StudentController.as_view()),
 
     re_path(r'^api/classes$', views.classAPI),
     re_path(r'^api/classes/([0-9]+)$', views.classAPI),

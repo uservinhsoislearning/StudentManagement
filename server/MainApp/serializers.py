@@ -134,7 +134,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'student_dob',
             'student_gender',
             'student_email',
-            'student_graduating_class',
+            'parent_email',
             'student_phone_number',
             'student_specialization',
             'student_is_active',
