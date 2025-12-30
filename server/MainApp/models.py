@@ -9,7 +9,6 @@ import os
 class Admin(models.Model):
     admin_id = models.AutoField(primary_key=True)
     admin_username = models.CharField(unique=True, max_length=255)
-    admin_password = models.CharField(max_length=255)
     admin_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
     admin_name = models.CharField(max_length=255, blank=True, null=True)
     admin_is_active = models.BooleanField(blank=True, null=True)
@@ -163,17 +162,6 @@ class Message(models.Model):
         db_table = 'message'
         ordering = ['-timestamp']
 
-class Parent(models.Model):
-    parent_id = models.AutoField(primary_key=True)
-    parent_name = models.CharField(max_length=255)
-    parent_gender = models.CharField(max_length=50, blank=True, null=True)
-    parent_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    parent_phone_number = models.CharField(max_length=20, blank=True, null=True)
-    parent_occupation = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        db_table = 'parent'
-
 class Registration(models.Model):
     connect_id = models.AutoField(primary_key=True)
     student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
@@ -237,7 +225,7 @@ class Student(models.Model):
     student_dob = models.DateTimeField(blank=True, null=True)
     student_gender = models.CharField(max_length=50, blank=True, null=True)
     student_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
-    student_graduating_class = models.IntegerField(blank=True, null=True)
+    parent_email = models.CharField(unique=True, max_length=255, blank=True, null=True)
     student_phone_number = models.CharField(max_length=20, blank=True, null=True)
     student_specialization = models.CharField(max_length=255, blank=True, null=True)
     student_is_active = models.BooleanField(blank=True, null=True)
@@ -245,25 +233,6 @@ class Student(models.Model):
 
     class Meta:
         db_table = 'student'
-
-
-class Studentparent(models.Model):
-    connect_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey(
-        'Student',
-        on_delete=models.CASCADE,
-        db_column='student_id'
-    )
-    parent = models.ForeignKey(
-        'Parent',
-        on_delete=models.CASCADE,
-        db_column='parent_id'
-    )
-    relationship_to_student = models.CharField(max_length=50, blank=True, null=True)
-
-    class Meta:
-        db_table = 'studentparent'
-        unique_together = (('student', 'parent'),)
 
 class Teacher(models.Model):
     teacher_id = models.AutoField(primary_key=True)

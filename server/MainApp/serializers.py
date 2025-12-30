@@ -175,22 +175,6 @@ class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
             'grade'
         )
 
-class ParentWithIDSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = m.Parent
-        fields = '__all__'
-
-class ParentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = m.Parent
-        fields = (
-            'parent_name',
-            'parent_gender',
-            'parent_email',
-            'parent_phone_number',
-            'parent_occupation'
-        )
-
 class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = m.Registration
@@ -222,15 +206,6 @@ class SemesterSerializer(serializers.ModelSerializer):
             'startDate',
             'endDate',
             'isActive'
-        )
-
-class StudentparentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = m.Studentparent
-        fields = (
-            'student',
-            'relationship_to_student',
-            'parent'
         )
 
 class WorkSerializer(serializers.ModelSerializer):

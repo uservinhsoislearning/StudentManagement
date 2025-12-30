@@ -75,7 +75,6 @@ const Login = () => {
               <option value="admin">Quản trị viên</option>
               <option value="teacher">Giáo viên</option>
               <option value="student">Sinh viên</option>
-              <option value="parent">Phụ huynh</option>
             </select>
           </div>
 

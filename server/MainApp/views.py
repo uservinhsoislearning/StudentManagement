@@ -387,32 +387,6 @@ def SemesterPatchAPI(request, sem_id=0):
             return JsonResponse({"error": "Semester not found"}, status=404)
     
 @csrf_exempt
-def ParentAPI(request, pid=0):
-    if request.method == 'GET':
-        parents=m.Parent.objects.all()
-        parents_serializer=s.ParentWithIDSerializer(parents,many=True)
-        return JsonResponse(parents_serializer.data, safe=False)
-    elif request.method == 'POST':
-        parents_data=JSONParser().parse(request)
-        parents_serializer=s.ParentSerializer(data=parents_data)
-        if parents_serializer.is_valid():
-            parents_serializer.save()
-            return JsonResponse("Thêm bố/mẹ vào cơ sở dữ liệu thành công!",safe=False)
-        return JsonResponse(parents_serializer.errors,safe=False)
-    elif request.method == 'PUT':
-        parents_data=JSONParser().parse(request)
-        parents=m.Parent.objects.get(parent_id = parents_data['parent_id'])
-        parents_serializer=s.ParentSerializer(parents, data=parents_data)
-        if parents_serializer.is_valid():
-            parents_serializer.save()
-            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
-        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
-    elif request.method == 'DELETE':
-        parents=m.Parent.objects.get(parent_id=pid)
-        parents.delete()
-        return JsonResponse("Xóa bố/mẹ thành công!",safe=False)
-    
-@csrf_exempt
 def ClassTimetableAPI(request, sid=0):
     if request.method == 'GET':
         class_ids=m.Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
@@ -528,13 +502,11 @@ def getSummaryAdmin(request):
     if request.method == 'GET':
         total_students = m.Student.objects.count()
         total_teachers = m.Teacher.objects.count()
-        total_parents = m.Parent.objects.count()
         reports_pending = m.Report.objects.filter(status='Pending').count()
 
         dashboard = {
             "totalStudents": total_students,
             "totalTeachers": total_teachers,
-            "totalParents": total_parents,
             "reportsPending": reports_pending
         }
 
@@ -677,44 +649,43 @@ def sendAttendance(request, cid=0):
                 return JsonResponse("Không có học sinh nào vắng vào ngày gần nhất!", safe=False)
 
             emails_sent = []
+            class_data = m.Class.objects.get(class_id=cid)
+            teacher = class_data.class_teacher
 
             for record in absent_records:
                 try:
                     sid = record.student
                     student = m.Student.objects.get(student_id=sid)
-                    parents = m.Studentparent.objects.filter(student=sid)
-                    class_data = m.Class.objects.get(class_id=cid)
-                    teacher = class_data.class_teacher
+                    parent_email = student.parent_email
+                    if not parent_email:
+                        print(f"Skipping student {student.student_name}: No parent_email found.")
+                        continue
+                    subject = "Thông báo vắng mặt"
 
-                    for relation in parents:
-                        parent = relation.parent
-                        subject = "Thông báo vắng mặt"
+                    html_message = render_to_string('absent.html', {
+                        'student_name': student.student_name,
+                        'class_name': class_data.class_name,
+                        'date': closest_date,
+                        'teacher_email': teacher.teacher_email
+                    })
 
-                        html_message = render_to_string('absent.html', {
-                            'student_name': student.student_name,
-                            'class_name': class_data.class_name,
-                            'date': closest_date,
-                            'teacher_email': teacher.teacher_email
-                        })
+                    plain_message = (
+                        f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
+                        f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
+                    )
 
-                        plain_message = (
-                            f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
-                            f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
-                        )
+                    from_email = settings.EMAIL_HOST_USER
 
-                        from_email = settings.EMAIL_HOST_USER
-                        to_email = [parent.parent_email]
-
-                        email = EmailMultiAlternatives(subject, plain_message, from_email, to_email)
-                        email.attach_alternative(html_message, "text/html")
-                        email.send()
-                        emails_sent.append(parent.parent_email)
+                    email = EmailMultiAlternatives(subject, plain_message, from_email, parent_email)
+                    email.attach_alternative(html_message, "text/html")
+                    email.send()
+                    emails_sent.append(parent_email) # for debugging
 
                 except Exception as e:
                     print(f"Error processing student ID {record.student}: {e}")
                     continue
 
-            return JsonResponse({
+            return JsonResponse({ # for debugging
                 "message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!",
                 "recipients": emails_sent
             })
@@ -875,36 +846,6 @@ def userRegisterAPI(request):
                 related_id = student.student_id
             else:
                 return JsonResponse(student_serializer.errors, safe=False)
-
-        elif usertype == 'Parent':
-            parent_data = {
-                'parent_name' : user_data.get('parent_name'),
-                'parent_gender' : user_data.get('parent_gender'),
-                'parent_email' : user_data.get('parent_email'),
-                'parent_phone_number' : user_data.get('parent_phone_number'),
-                'parent_occupation' : user_data.get('parent_occupation')
-            }
-
-            check_student_data = {
-                'student' : user_data.get('student_id'),
-                'relationship_to_student' : user_data.get('relationship_to_student')
-            }
-            try:
-                student_check = m.Student.objects.get(student_id=check_student_data['student'])
-                parent_serializer = s.ParentSerializer(data=parent_data)
-                if parent_serializer.is_valid():
-                    parent = parent_serializer.save()
-                    related_id = parent.parent_id
-                    check_student_data['parent'] = related_id
-                    connect = s.StudentparentSerializer(data=check_student_data)
-                    if connect.is_valid():
-                        connect.save()
-                    else:
-                        return JsonResponse("Unknown error happen!", safe=False)
-                else:
-                    return JsonResponse(parent_serializer.errors, safe=False)
-            except m.Student.DoesNotExist:
-                    return JsonResponse("Không thể tạo tài khoản phụ huynh không có sinh viên trong hệ thống!", safe=False)
         else:
             return JsonResponse("Loại người dùng không hợp lệ.", safe=False)
 
@@ -1024,13 +965,6 @@ def getSummaryStudent(request, sid=0):
     }
 
     return JsonResponse(dashboard, safe=False)
-
-@csrf_exempt
-def getSummaryParent(request, pid=0):
-    if request.method == "GET":
-        parent = m.Parent.objects.get(parent_id=pid)
-        parent_serializer = s.ParentWithIDSerializer(parent)
-        return JsonResponse(parent_serializer.data, safe=False)
 
 # comment this after running 
 # @csrf_exempt

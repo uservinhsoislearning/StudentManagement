@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate} from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
 // Auth
@@ -57,6 +57,9 @@ const RegisterWrapper = () => {
 const AppRoutes = () => {
   return (
     <Routes>
+      {/*Navigate to login */}
+      <Route path="/" element={<Navigate to="/login" replace />} /> 
+      
       {/* Auth */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<RegisterWrapper />} />
@@ -90,11 +93,6 @@ const AppRoutes = () => {
       <Route path="/student/schedule" element={<ProtectedRoute role="student"><StudentLayout><Schedule /></StudentLayout></ProtectedRoute>} />
       <Route path="/student/grades" element={<ProtectedRoute role="student"><StudentLayout><Grades /></StudentLayout></ProtectedRoute>} />
       <Route path="/student/register-courses" element={<ProtectedRoute role="student"><StudentLayout><RegisterCourses /></StudentLayout></ProtectedRoute>} />
-
-      {/* Parent routes */}
-      <Route path="/parent" element={<ProtectedRoute role="parent"><ParentLayout><ParentDashboard /></ParentLayout></ProtectedRoute>} />
-      <Route path="/parent/view-student-progress" element={<ProtectedRoute role="parent"><ParentLayout><ViewStudentProgress /></ParentLayout></ProtectedRoute>} />
-      <Route path="/parent/communication" element={<ProtectedRoute role="parent"><ParentLayout><Communication /></ParentLayout></ProtectedRoute>} />
 
       {/* Common route - profile */}
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

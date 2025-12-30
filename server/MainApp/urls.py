@@ -35,9 +35,6 @@ urlpatterns = [
     re_path(r'^api/semesters/([0-9]+)$', views.SemesterAPI),
     re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI),
 
-    re_path(r'^api/parents$', views.ParentAPI),
-    re_path(r'^api/parents/(?P<pid>\d+)$', views.ParentAPI),
-
     re_path(r'^api/student/(?P<sid>\d+)/grades$', views.getGradeStudent),
 
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', views.ClassTimetableAPI),
@@ -74,9 +71,7 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', views.submitWork),
 
-    re_path(r'^api/dashboard/student/(?P<sid>\d+)$', views.getSummaryStudent),
-
-    re_path(r'^api/dashboard/parent/(?P<pid>\d+)$', views.getSummaryParent)
+    re_path(r'^api/dashboard/student/(?P<sid>\d+)$', views.getSummaryStudent)
 
     # re_path(r'^api/users', views.addUserAdmin),
     # re_path(r'^api/addAdmin', views.addAdmin)
