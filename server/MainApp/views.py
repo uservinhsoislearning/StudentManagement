@@ -42,31 +42,31 @@ from MainApp import serializers as s
 #         students.delete()
 #         return JsonResponse("Deleted Successfully!",safe=False)
     
-@csrf_exempt
-def classAPI(request,id=0):
-    if request.method == 'GET':
-        classes=m.Class.objects.all()
-        classes_serializer=s.ClassWithTimetableSerializer(classes,many=True)
-        return JsonResponse(classes_serializer.data, safe=False)
-    elif request.method == 'POST':
-        classes_data=JSONParser().parse(request)
-        classes_serializer=s.ClassWithCourseSerializer(data=classes_data)
-        if classes_serializer.is_valid():
-            classes_serializer.save()
-            return JsonResponse("Thêm lớp vào cơ sở dữ liệu thành công!",safe=False)
-        return JsonResponse(classes_serializer.errors,safe=False)
-    elif request.method == 'PUT':
-        classes_data=JSONParser().parse(request)
-        classes=m.Class.objects.get(class_id = classes_data['class_id'])
-        classes_serializer=s.ClassSerializer(classes, data=classes_data)
-        if classes_serializer.is_valid():
-            classes_serializer.save()
-            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
-        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
-    elif request.method == 'DELETE':
-        classes=m.Class.objects.get(class_id=id)
-        classes.delete()
-        return JsonResponse("Xóa lớp thành công!",safe=False)
+# @csrf_exempt
+# def classAPI(request,id=0):
+#     if request.method == 'GET':
+#         classes=m.Class.objects.all()
+#         classes_serializer=s.ClassWithTimetableSerializer(classes,many=True)
+#         return JsonResponse(classes_serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         classes_data=JSONParser().parse(request)
+#         classes_serializer=s.ClassWithCourseSerializer(data=classes_data)
+#         if classes_serializer.is_valid():
+#             classes_serializer.save()
+#             return JsonResponse("Thêm lớp vào cơ sở dữ liệu thành công!",safe=False)
+#         return JsonResponse(classes_serializer.errors,safe=False)
+#     elif request.method == 'PUT':
+#         classes_data=JSONParser().parse(request)
+#         classes=m.Class.objects.get(class_id = classes_data['class_id'])
+#         classes_serializer=s.ClassSerializer(classes, data=classes_data)
+#         if classes_serializer.is_valid():
+#             classes_serializer.save()
+#             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
+#         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
+#     elif request.method == 'DELETE':
+#         classes=m.Class.objects.get(class_id=id)
+#         classes.delete()
+#         return JsonResponse("Xóa lớp thành công!",safe=False)
     
 # @csrf_exempt
 # def teacherAPI(request,tid=0):
