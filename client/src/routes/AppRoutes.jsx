@@ -62,7 +62,7 @@ const AppRoutes = () => {
       
       {/* Auth */}
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<RegisterWrapper />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Admin routes */}

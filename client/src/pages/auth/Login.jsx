@@ -84,7 +84,7 @@ const Login = () => {
         </form>
 
         <div className={styles.link}>
-          <p>Nếu bạn chưa có tài khoản, vui lòng liên hệ quản trị viên.</p>
+          <p>Nếu bạn chưa có tài khoản, <a href="http://localhost:5173/register">tạo</a>, hoặc vui lòng liên hệ quản trị viên.</p>
         </div>
       </div>
     </div>
