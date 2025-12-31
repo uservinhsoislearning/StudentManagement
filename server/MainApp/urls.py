@@ -3,14 +3,16 @@ from MainApp import views
 from . import controllers
 
 urlpatterns = [
+    # Student CRUD
     re_path(r'^api/students$', controllers.studentAPI.StudentController.as_view()),
     re_path(r'^api/students/(?P<sid>\d+)$', controllers.studentAPI.StudentController.as_view()),
 
+    # Teacher CRUD
+    re_path(r'^api/teachers$', controllers.teacherAPI.TeacherController.as_view()),
+    re_path(r'^api/teachers/(?P<tid>\d+)$', controllers.teacherAPI.TeacherController.as_view()),
+
     re_path(r'^api/classes$', views.classAPI),
     re_path(r'^api/classes/([0-9]+)$', views.classAPI),
-
-    re_path(r'^api/teachers$', views.teacherAPI),
-    re_path(r'^api/teachers/(?P<tid>\d+)$', views.teacherAPI),
 
     re_path(r'^api/classes/students$', views.EnrollmentAPI),
     re_path(r'^api/classes/(?P<class_id>\d+)/students$', views.EnrollmentAPI),
