@@ -6,25 +6,59 @@ from django.template.loader import render_to_string
 from django.utils.crypto import get_random_string
 from django.core.mail import EmailMultiAlternatives
 import server.settings as settings
-from MainApp import models as m
+from MainApp.models import Userlogin
 from MainApp import serializers as s
 
-class UserLoginController(APIView):
+class LoginController(APIView):
     def post(self, request):
-        # ... [Paste UserLoginController logic here] ...
-        pass
+        email = request.data.get('useremail')
+        password = request.data.get('password')
+        name = request.data.get('username')
+
+        if (name and password) or (email and password):
+            try:
+
+                user = Userlogin.objects.get(useremail = email) if email else Userlogin.objects.get(username = name)
+
+                if check_password(password, user.password):
+                    request.session['user_id'] = user.user_id
+                    return Response({
+                        "message": "Đăng nhập thành công!", 
+                        "username": user.username,  
+                        "useremail": user.useremail,
+                        "usertype": user.usertype
+                    })
+                else:
+                    return Response("Mật khẩu không đúng, Vui lòng thử lại!", status=status.HTTP_401_UNAUTHORIZED)
+            except Userlogin.DoesNotExist:
+                return Response("Tài khoản không tồn tại!", status=status.HTTP_404_NOT_FOUND)
+        else:
+            if not name or not email:
+                return Response("Thiếu username hoặc email!", status=status.HTTP_400_BAD_REQUEST)
+            if not password:
+                return Response("Thiếu password!", status=status.HTTP_400_BAD_REQUEST)
 
 class UserRegisterController(APIView):
     def post(self, request):
         # ... [Paste UserRegisterController logic here] ...
         pass
 
-class CurrentUserController(APIView):
+class SessionController(APIView):
     def get(self, request):
-        # ... [Paste CurrentUserController logic here] ...
-        pass
+        user_id = request.session.get('user_id')
+        try:
+            user = Userlogin.objects.get(user_id=user_id)
+        except Userlogin.DoesNotExist:
+            return Response("User not logged in", status=status.HTTP_401_UNAUTHORIZED)
 
-class UserLogoutController(APIView):
+        return Response({
+            "user_id": user.user_id,
+            "email": user.useremail,
+            "usertype": user.usertype,
+            "relatedid": user.relatedid
+        })
+
+class LogoutController(APIView):
     def post(self, request):
         request.session.flush()
         return Response("Logged out successfully!")

@@ -3,6 +3,13 @@ from MainApp import views
 from . import controllers
 
 urlpatterns = [
+    # Login, register, logout
+    re_path(r'^api/auth/login$', controllers.authAPI.LoginController.as_view()),
+    re_path(r'^api/auth/register$',views.userRegisterAPI),
+    re_path(r'^api/auth/forgot-password$',views.forgotPassword),
+    re_path(r'^api/auth/me$', controllers.authAPI.SessionController.as_view()),
+    re_path(r'^api/auth/logout$', controllers.authAPI.LogoutController.as_view()),
+
     # Student CRUD
     re_path(r'^api/students$', controllers.studentAPI.StudentController.as_view()),
     re_path(r'^api/students/(?P<sid>\d+)$', controllers.studentAPI.StudentController.as_view()),
@@ -11,8 +18,9 @@ urlpatterns = [
     re_path(r'^api/teachers$', controllers.teacherAPI.TeacherController.as_view()),
     re_path(r'^api/teachers/(?P<tid>\d+)$', controllers.teacherAPI.TeacherController.as_view()),
 
-    re_path(r'^api/classes$', views.classAPI),
-    re_path(r'^api/classes/([0-9]+)$', views.classAPI),
+    # Class CRUD
+    re_path(r'^api/classes$', controllers.classAPI.ClassController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)$', controllers.classAPI.ClassController.as_view()),
 
     re_path(r'^api/classes/students$', views.EnrollmentAPI),
     re_path(r'^api/classes/(?P<class_id>\d+)/students$', views.EnrollmentAPI),
@@ -65,12 +73,6 @@ urlpatterns = [
     re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
 
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', views.gradeWorkAPI),
-
-    re_path(r'^api/auth/login$', views.userLoginAPI),
-    re_path(r'^api/auth/register$',views.userRegisterAPI),
-    re_path(r'^api/auth/forgot-password$',views.forgotPassword),
-    re_path(r'^api/auth/me$', views.getCurrentUser),
-    re_path(r'^api/auth/logout$', views.userLogout),
 
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', views.submitWork),
 
