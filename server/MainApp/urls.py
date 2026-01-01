@@ -5,7 +5,7 @@ from . import controllers
 urlpatterns = [
     # Login, register, logout
     re_path(r'^api/auth/login$', controllers.authAPI.LoginController.as_view()),
-    re_path(r'^api/auth/register$',views.userRegisterAPI),
+    re_path(r'^api/auth/register$', controllers.authAPI.RegisterController.as_view()),
     re_path(r'^api/auth/forgot-password$',controllers.authAPI.ForgotPasswordController.as_view()),
     re_path(r'^api/auth/me$', controllers.authAPI.SessionController.as_view()),
     re_path(r'^api/auth/logout$', controllers.authAPI.LogoutController.as_view()),

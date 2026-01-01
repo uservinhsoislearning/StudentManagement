@@ -2,19 +2,70 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.hashers import check_password
-from django.template.loader import render_to_string
-from django.utils.crypto import get_random_string
+
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 import server.settings as settings
 from MainApp.models import Userlogin
-from MainApp import serializers as s
+from MainApp.serializers import TeacherSerializer, StudentSerializer, UserloginSerializer
 
 # RegisterController is not used by all users, but by the admin only.
 class RegisterController(APIView):
     def post(self, request):
-        # ... [Paste UserRegisterController logic here] ...
-        pass
+        user_data = request.data
+        username = user_data.get('username')
+        useremail = user_data.get('useremail')
+        usertype = user_data.get('usertype')
+
+        if Userlogin.objects.filter(username=username).exists():
+            return Response("Tên tài khoản này đã tồn tại!", status=status.HTTP_400_BAD_REQUEST)
+        if Userlogin.objects.filter(useremail=useremail).exists():
+            return Response("Email này đã tồn tại!", status=status.HTTP_400_BAD_REQUEST)
+        
+        related_id = None
+
+        if usertype == 'Teacher':
+            teacher_data = {
+                'teacher_name': user_data.get('teacher_name'),
+                'teacher_gender': user_data.get('teacher_gender'),
+                'teacher_email': user_data.get('teacher_email'),
+                'teacher_profession': user_data.get('teacher_profession'),
+            }
+            teacher_serializer = TeacherSerializer(data=teacher_data)
+            
+            if teacher_serializer.is_valid():
+                teacher = teacher_serializer.save()
+                related_id = teacher.teacher_id
+            else:
+                return Response(teacher_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif usertype == 'Student':
+            student_data = {
+                'student_name': user_data.get('student_name'),
+                'student_dob': user_data.get('student_dob'),
+                'student_gender': user_data.get('student_gender'),
+                'student_email': user_data.get('student_email'),
+                'parent_email': user_data.get('parent_email'),
+                'student_phone_number': user_data.get('student_phone_number'),
+                'student_specialization': user_data.get('student_specialization'),
+                'student_is_active': user_data.get('student_is_active')
+            }
+            student_serializer = StudentSerializer(data=student_data)
+            
+            if student_serializer.is_valid():
+                student = student_serializer.save()
+                related_id = student.student_id
+            else:
+                return Response(student_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response("Loại người dùng không hợp lệ!", status=status.HTTP_400_BAD_REQUEST)
+        
+        user_data['relatedid'] = related_id
+
+        user_serializer = UserloginSerializer(data=user_data)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response("Thêm tài khoản thành công!", status=status.HTTP_201_CREATED)
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginController(APIView):
     def post(self, request):
