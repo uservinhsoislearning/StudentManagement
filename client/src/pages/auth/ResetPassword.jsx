@@ -78,7 +78,7 @@ const ResetPassword = () => {
         {token ? (
             <form onSubmit={handleSubmit}>
             <div className={styles.inputGroup}>
-                <label className={styles.label}>Mật khẩu mới:</label>
+                <label className={styles.label}>New Password</label>
                 <input
                 type="password"
                 value={password}
@@ -90,7 +90,7 @@ const ResetPassword = () => {
             </div>
 
             <div className={styles.inputGroup}>
-                <label className={styles.label}>Xác nhận mật khẩu:</label>
+                <label className={styles.label}>Confirm New Password</label>
                 <input
                 type="password"
                 value={confirmPassword}

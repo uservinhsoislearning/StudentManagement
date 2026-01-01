@@ -81,3 +81,36 @@
     text-decoration: none;
     font-weight: 500;
 }
+/* SHOW/HIDE button */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Style the button to sit on the right */
+.toggleBtn {
+  position: absolute;
+  right: 10px; /* Adjust based on your padding */
+  top: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666; /* Icon color */
+  padding: 0;
+}
+
+.toggleBtn:hover {
+  color: #333;
+}
+
+/* IMPORTANT: Add padding to the existing input class 
+   so the text doesn't go behind the icon */
+.input {
+  /* ... keep your existing styles ... */
+  padding-right: 40px; /* Add this line */
+}
