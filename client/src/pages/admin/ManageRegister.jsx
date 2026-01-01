@@ -17,22 +17,14 @@ const ManageRegister = () => {
         student_dob: "",
         student_gender: "",
         student_email: "",
-        student_graduating_class: "",
+        parent_email: "",
         student_phone_number: "",
         student_specialization: "",
         student_is_active: true,
-        student_school: "",
         teacher_name: "",
         teacher_gender: "",
         teacher_email: "",
-        teacher_profession: "",
-        parent_name: "",
-        parent_gender: "",
-        parent_email: "",
-        parent_phone_number: "",
-        parent_occupation: "",
-        student_id: "",
-        relationship_to_student: ""
+        teacher_profession: ""
     });
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -64,11 +56,10 @@ const ManageRegister = () => {
                 student_dob: form.student_dob,
                 student_gender: form.student_gender,
                 student_email: form.student_email,
-                student_graduating_class: form.student_graduating_class,
+                parent_email: form.parent_email,
                 student_phone_number: form.student_phone_number,
                 student_specialization: form.student_specialization,
                 student_is_active: true,
-                student_school: form.student_school,
             };
         } else if (form.usertype === "Teacher") {
             dataToSend = {
@@ -77,17 +68,6 @@ const ManageRegister = () => {
                 teacher_gender: form.teacher_gender,
                 teacher_email: form.teacher_email,
                 teacher_profession: form.teacher_profession,
-            };
-        } else if (form.usertype === "Parent") {
-            dataToSend = {
-                ...dataToSend,
-                parent_name: form.parent_name,
-                parent_gender: form.parent_gender,
-                parent_email: form.parent_email,
-                parent_phone_number: form.parent_phone_number,
-                parent_occupation: form.parent_occupation,
-                student_id: form.student_id,
-                relationship_to_student: form.relationship_to_student,
             };
         }
 
@@ -157,11 +137,10 @@ const ManageRegister = () => {
                     student_dob: row.student_dob,
                     student_gender: row.student_gender,
                     student_email: row.student_email,
-                    student_graduating_class: row.student_graduating_class,
+                    parent_email: row.parent_email,
                     student_phone_number: row.student_phone_number,
                     student_specialization: row.student_specialization,
                     student_is_active: true,
-                    student_school: row.student_school,
                 };
             case "Teacher":
                 return {
@@ -170,17 +149,6 @@ const ManageRegister = () => {
                     teacher_gender: row.teacher_gender,
                     teacher_email: row.teacher_email,
                     teacher_profession: row.teacher_profession,
-                };
-            case "Parent":
-                return {
-                    ...base,
-                    parent_name: row.parent_name,
-                    parent_gender: row.parent_gender,
-                    parent_email: row.parent_email,
-                    parent_phone_number: row.parent_phone_number,
-                    parent_occupation: row.parent_occupation,
-                    student_id: row.student_id,
-                    relationship_to_student: row.relationship_to_student,
                 };
             default:
                 throw new Error("Loại người dùng không hợp lệ trong CSV");
@@ -196,10 +164,9 @@ const ManageRegister = () => {
                         <Input label="Ngày sinh" name="student_dob" type="date" value={form.student_dob} onChange={handleChange} required />
                         <Input label="Giới tính" name="student_gender" value={form.student_gender} onChange={handleChange} required />
                         <Input label="Email" name="student_email" value={form.student_email} onChange={handleChange} required />
-                        <Input label="Lớp tốt nghiệp" name="student_graduating_class" value={form.student_graduating_class} onChange={handleChange} required />
+                        <Input label="Email phụ huynh" name="parent_email" value={form.parent_email} onChange={handleChange} required />
                         <Input label="SĐT" name="student_phone_number" value={form.student_phone_number} onChange={handleChange} required />
                         <Input label="Chuyên ngành" name="student_specialization" value={form.student_specialization} onChange={handleChange} required />
-                        <Input label="Trường" name="student_school" value={form.student_school} onChange={handleChange} required />
                     </>
                 );
             case "Teacher":
@@ -209,18 +176,6 @@ const ManageRegister = () => {
                         <Input label="Giới tính" name="teacher_gender" value={form.teacher_gender} onChange={handleChange} required />
                         <Input label="Email" name="teacher_email" value={form.teacher_email} onChange={handleChange} required />
                         <Input label="Chuyên môn" name="teacher_profession" value={form.teacher_profession} onChange={handleChange} required />
-                    </>
-                );
-            case "Parent":
-                return (
-                    <>
-                        <Input label="Tên phụ huynh" name="parent_name" value={form.parent_name} onChange={handleChange} required />
-                        <Input label="Giới tính" name="parent_gender" value={form.parent_gender} onChange={handleChange} required />
-                        <Input label="Email" name="parent_email" value={form.parent_email} onChange={handleChange} required />
-                        <Input label="SĐT" name="parent_phone_number" value={form.parent_phone_number} onChange={handleChange} required />
-                        <Input label="Nghề nghiệp" name="parent_occupation" value={form.parent_occupation} onChange={handleChange} required />
-                        <Input label="ID sinh viên liên kết" name="student_id" value={form.student_id} onChange={handleChange} required />
-                        <Input label="Mối quan hệ với sinh viên" name="relationship_to_student" value={form.relationship_to_student} onChange={handleChange} required />
                     </>
                 );
             default:
@@ -239,8 +194,7 @@ const ManageRegister = () => {
                     onChange={handleChange}
                     options={[
                         { value: "Student", label: "Sinh viên" },
-                        { value: "Teacher", label: "Giáo viên" },
-                        { value: "Parent", label: "Phụ huynh" }
+                        { value: "Teacher", label: "Giáo viên" }
                     ]}
                 />
                 <Input label="Tên đăng nhập" name="username" value={form.username} onChange={handleChange} required />

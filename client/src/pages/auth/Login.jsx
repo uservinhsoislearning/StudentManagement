@@ -84,7 +84,8 @@ const Login = () => {
         </form>
 
         <div className={styles.link}>
-          <p>Nếu bạn chưa có tài khoản, <a href="http://localhost:5173/register">tạo</a>, hoặc vui lòng liên hệ quản trị viên.</p>
+          <p>Nếu bạn chưa có tài khoản, liên hệ quản trị viên qua <a href="https://mail.google.com/mail/u/0/#inbox?compose=DmwnWrRttNcqrPCCgmgcNZTKsqKDbFNJmnrVnclNcSDPsRGkRqtqWdWQWjrKxLrMrLfrNRSCfNkg">email</a> vinhthanhtran03102004@gmail.com.</p>
+          <a href="/forgot-password">Quên mật khẩu?</a>
         </div>
       </div>
     </div>

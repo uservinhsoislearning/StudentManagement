@@ -5,7 +5,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-
+import ResetPassword from "../pages/auth/ResetPassword";
 // Admin pages
 import AdminDashboard from "../pages/admin/Dashboard";
 import ManageAllClasses from "../pages/admin/ManageAllClasses";
@@ -45,7 +45,6 @@ import Profile from "../pages/common/Profile";
 // Layouts
 import { useAuth } from "../context/AuthContext";
 import AdminLayout from "../layouts/AdminLayout";
-import ParentLayout from "../layouts/ParentLayout";
 import StudentLayout from "../layouts/StudentLayout";
 import TeacherLayout from "../layouts/TeacherLayout";
 const RegisterWrapper = () => {
@@ -62,8 +61,9 @@ const AppRoutes = () => {
       
       {/* Auth */}
       <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* <Route path="/register" element={<Register />} /> */}
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword/>} />
 
       {/* Admin routes */}
       <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboard /></AdminLayout></ProtectedRoute>} />

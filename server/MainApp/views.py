@@ -831,11 +831,10 @@ def userRegisterAPI(request):
                 'student_dob' : user_data.get('student_dob'),
                 'student_gender' : user_data.get('student_gender'),
                 'student_email' : user_data.get('student_email'),
-                'student_graduating_class' : user_data.get('student_graduating_class'),
+                'parent_email' : user_data.get('parent_email'),
                 'student_phone_number' : user_data.get('student_phone_number'),
                 'student_specialization' : user_data.get('student_specialization'),
-                'student_is_active' : user_data.get('student_is_active'),
-                'student_school' : user_data.get('student_school')
+                'student_is_active' : user_data.get('student_is_active')
             }
             student_serializer = s.StudentSerializer(data=student_data)
             if student_serializer.is_valid():
@@ -895,12 +894,6 @@ def forgotPassword(request):
 #             "usertype": user.usertype,
 #             "relatedid": user.relatedid
 #         })
-
-# @csrf_exempt
-# def userLogout(request):
-#     if request.method == 'POST':
-#         request.session.flush()
-#         return JsonResponse("Logged out successfully!", safe=False)
     
 @csrf_exempt
 def submitWork(request, cid=0, aid=0, sid=0):
