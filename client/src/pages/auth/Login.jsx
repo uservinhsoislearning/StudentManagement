@@ -8,7 +8,7 @@ const Login = () => {
   const { login, user } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("student");
   const [error, setError] = useState("");
@@ -18,7 +18,7 @@ const Login = () => {
     setError("");
 
     try {
-      await login(email, password, role);
+      await login(identifier, password, role);
       // Không navigate ở đây nữa
     } catch (err) {
       setError(err.message || "Đăng nhập thất bại!");
@@ -30,7 +30,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user && user.role && location.pathname === "/login") {
-      navigate(`/${user.role.toLowerCase()}`); // ✅ dùng backticks để tạo template string
+      navigate(`/${user.role.toLowerCase()}`);
     }
   }, [user, location, navigate]);
 
@@ -44,24 +44,26 @@ const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Email:</label>
+            <label className={styles.label}>Email/Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
               className={styles.input}
+              placeholder="Nhập email hoặc username"
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Mật khẩu:</label>
+            <label className={styles.label}>Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               className={styles.input}
+              placeholder="Mật khẩu"
             />
           </div>
 

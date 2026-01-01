@@ -23,13 +23,12 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       { label: "Dashboard", path: "/admin", icon: <FaHome /> },
       { label: "QL Học sinh", path: "/admin/manage-students", icon: <FaUserGraduate /> },
       { label: "QL Giáo viên", path: "/admin/manage-teachers", icon: <FaChalkboardTeacher /> },
-      { label: "QL Phụ huynh", path: "/admin/manage-parents", icon: <FaUserGraduate /> },
       // { label: "QL Môn học", path: "/admin/manage-subjects", icon: <FaBook /> },
       { label: "QL Học kỳ", path: "/admin/manage-semesters", icon: <FaCalendarAlt /> },
       { label: "QL Lớp học phần", path: "/admin/manage-course-classes", icon: <FaClipboardList /> },
       { label: "QL Lớp", path: "/admin/manage-classes", icon: <FaClipboardList /> },
 
-      { label: "Tạo tài khoản", path: "/admin/manage-register", icon: <FaUserGraduate /> }, // ✅ Mục mới
+      { label: "Tạo tài khoản", path: "/admin/manage-register", icon: <FaUserGraduate /> },
       { label: "Báo cáo", path: "/admin/reports", icon: <FaChartBar /> },
     ],
     teacher: [
@@ -40,7 +39,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       { label: "Chấm bài tập", path: "/teacher/grading", icon: <FaBook /> },
 
       { label: "Quản lý điểm", path: "/teacher/grades", icon: <FaChartBar /> },
-      { label: "Danh sách phụ huynh", path: "/teacher/parents", icon: <FaUserGraduate /> },
     ],
     student: [
       { label: "Dashboard", path: "/student", icon: <FaHome /> },
@@ -49,12 +47,6 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       { label: "Thời khoá biểu", path: "/student/schedule", icon: <FaCalendarAlt /> },
       { label: "Kết quả học tập", path: "/student/grades", icon: <FaChartBar /> },
       { label: "Đăng ký học phần", path: "/student/register-courses", icon: <FaClipboardList /> },
-    ],
-    parent: [
-      { label: "Dashboard", path: "/parent", icon: <FaHome /> },
-      { label: "Tiến độ học tập", path: "/parent/view-student-progress", icon: <FaChartBar /> },
-      { label: "Điểm danh", path: "/parent/attendance-report", icon: <FaCalendarAlt /> },
-      { label: "Giao tiếp", path: "/parent/communication", icon: <FaClipboardList /> },
     ],
   };
 
@@ -85,7 +77,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             border: "none",
             fontSize: "18px",
             cursor: "pointer",
-            color: "#2563eb",
+            color: "#b22222",
           }}
         >
           <FaBars />

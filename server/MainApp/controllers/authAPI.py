@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import check_password
 
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.db.models import Q
 import server.settings as settings
 from MainApp.models import Userlogin
 from MainApp.serializers import TeacherSerializer, StudentSerializer, UserloginSerializer
@@ -69,14 +70,14 @@ class RegisterController(APIView):
 
 class LoginController(APIView):
     def post(self, request):
-        email = request.data.get('useremail')
+        identifier = request.data.get('username') or request.data.get('useremail')
         password = request.data.get('password')
-        name = request.data.get('username')
 
-        if (name and password) or (email and password):
+        if identifier:
             try:
-
-                user = Userlogin.objects.get(useremail = email) if email else Userlogin.objects.get(username = name)
+                user = Userlogin.objects.get(
+                    Q(useremail = identifier) | Q(username = identifier)
+                )
 
                 if check_password(password, user.password):
                     request.session['user_id'] = user.user_id
@@ -91,7 +92,7 @@ class LoginController(APIView):
             except Userlogin.DoesNotExist:
                 return Response("Tài khoản không tồn tại!", status=status.HTTP_404_NOT_FOUND)
         else:
-            if not name or not email:
+            if not identifier:
                 return Response("Thiếu username hoặc email!", status=status.HTTP_400_BAD_REQUEST)
             if not password:
                 return Response("Thiếu password!", status=status.HTTP_400_BAD_REQUEST)
