@@ -94,48 +94,48 @@ from MainApp import serializers as s
 #         teachers.delete()
 #         return JsonResponse("Xóa thầy/cô thành công!",safe=False)
 
-@csrf_exempt
-def EnrollmentAPI(request, class_id=0, student_id=0):
-    if request.method == 'POST':
-        enrollment_data=JSONParser().parse(request)
-        enrollment_data['withdrawal_date'] = None 
-        enrollment_data['grade'] = None
-        enrollment_data['midterm'] = None
-        enrollment_data['final'] = None
-        enrollment_serializer=s.EnrollmentSerializer(data=enrollment_data)
-        if enrollment_serializer.is_valid():
-            enrollment_serializer.save()
-            return JsonResponse("Thêm học sinh vào lớp thành công!",safe=False)
-        return JsonResponse("Xin thử lại!",safe=False)
-    elif request.method == 'PUT':
-        if class_id == 0 or student_id == 0:
-            return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
+# @csrf_exempt
+# def EnrollmentAPI(request, class_id=0, student_id=0):
+#     if request.method == 'POST':
+#         enrollment_data=JSONParser().parse(request)
+#         enrollment_data['withdrawal_date'] = None 
+#         enrollment_data['grade'] = None
+#         enrollment_data['midterm'] = None
+#         enrollment_data['final'] = None
+#         enrollment_serializer=s.EnrollmentSerializer(data=enrollment_data)
+#         if enrollment_serializer.is_valid():
+#             enrollment_serializer.save()
+#             return JsonResponse("Thêm học sinh vào lớp thành công!",safe=False)
+#         return JsonResponse("Xin thử lại!",safe=False)
+#     elif request.method == 'PUT':
+#         if class_id == 0 or student_id == 0:
+#             return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
 
-        try:
-            enrollment=m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
-        except m.Enrollment.DoesNotExist:
-            return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
+#         try:
+#             enrollment=m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
+#         except m.Enrollment.DoesNotExist:
+#             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
-        update_data = JSONParser().parse(request)
+#         update_data = JSONParser().parse(request)
 
-        # Allow partial update for grade fields
-        enrollment.grade = update_data.get('grade', enrollment.grade)
-        enrollment.midterm = update_data.get('midterm', enrollment.midterm)
-        enrollment.final = update_data.get('final', enrollment.final)
-        enrollment.save()
+#         # Allow partial update for grade fields
+#         enrollment.grade = update_data.get('grade', enrollment.grade)
+#         enrollment.midterm = update_data.get('midterm', enrollment.midterm)
+#         enrollment.final = update_data.get('final', enrollment.final)
+#         enrollment.save()
 
-        serializer = s.EnrollmentSerializer(enrollment)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'DELETE':
-        if class_id == 0 or student_id == 0:
-            return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
+#         serializer = s.EnrollmentSerializer(enrollment)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'DELETE':
+#         if class_id == 0 or student_id == 0:
+#             return JsonResponse("Thiếu class_id hoặc student_id trong URL!", safe=False)
 
-        try:
-            enrollment = m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
-            enrollment.delete()
-            return JsonResponse("Xóa học sinh khỏi lớp thành công!", safe=False)
-        except m.Enrollment.DoesNotExist:
-            return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
+#         try:
+#             enrollment = m.Enrollment.objects.get(class_field_id=class_id, student_id=student_id)
+#             enrollment.delete()
+#             return JsonResponse("Xóa học sinh khỏi lớp thành công!", safe=False)
+#         except m.Enrollment.DoesNotExist:
+#             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
 @csrf_exempt
 def getGradeClass(request, cid=0):

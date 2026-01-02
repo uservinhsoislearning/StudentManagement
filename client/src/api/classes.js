@@ -50,7 +50,7 @@ export const addStudentToClass = async (classId, studentId) => {
         class_field: classId,
         student: Number(studentId),
     };
-    const response = await axios.post(`${API_URL}/${classId}/students`, payload);
+    const response = await axios.post(`${API_URL}/students`, payload);
     return response.data;
 };
 

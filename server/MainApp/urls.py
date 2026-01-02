@@ -22,9 +22,10 @@ urlpatterns = [
     re_path(r'^api/classes$', controllers.classAPI.ClassController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)$', controllers.classAPI.ClassController.as_view()),
 
-    re_path(r'^api/classes/students$', views.EnrollmentAPI),
-    re_path(r'^api/classes/(?P<class_id>\d+)/students$', views.EnrollmentAPI),
-    re_path(r'^api/classes/(?P<class_id>\d+)/students/(?P<student_id>\d+)$', views.EnrollmentAPI),
+    # Enrollment (Add student to a class)
+    re_path(r'^api/classes/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)$', controllers.enrollmentAPI.EnrollmentController.as_view()),
 
     re_path(r'^api/classes/(?P<cid>\d+)/grades$', views.getGradeClass),
 
@@ -70,12 +71,12 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<cid>\d+)/details$', views.getMoreDetails),
 
-    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
-
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', views.gradeWorkAPI),
 
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', views.submitWork),
 
+    # Get summary
+    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
     re_path(r'^api/dashboard/student/(?P<sid>\d+)$', views.getSummaryStudent)
 
     # re_path(r'^api/users', views.addUserAdmin),
