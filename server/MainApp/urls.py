@@ -24,7 +24,6 @@ urlpatterns = [
 
     # Enrollment (Add student to a class)
     re_path(r'^api/classes/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
-    re_path(r'^api/classes/(?P<cid>\d+)/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)$', controllers.enrollmentAPI.EnrollmentController.as_view()),
 
     re_path(r'^api/classes/(?P<cid>\d+)/grades$', views.getGradeClass),
