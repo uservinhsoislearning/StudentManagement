@@ -221,31 +221,31 @@ def AssignmentFileAPI(request,id=0):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt        
-def CourseAPI(request,crid=0):
-    if request.method == 'GET':
-        courses=m.Course.objects.all()
-        courses_serializer=s.CourseWithIDSerializer(courses,many=True)
-        return JsonResponse(courses_serializer.data, safe=False)
-    elif request.method == 'POST':
-        courses_data=JSONParser().parse(request)
-        courses_serializer=s.CourseSerializer(data=courses_data)
-        if courses_serializer.is_valid():
-            courses_serializer.save()
-            return JsonResponse("Thêm môn học vào cơ sở dữ liệu thành công!",safe=False)
-        return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
-    elif request.method == 'PUT':
-        courses_data=JSONParser().parse(request)
-        courses=m.Course.objects.get(course_id=crid)
-        courses_serializer=s.CourseSerializer(courses, data=courses_data)
-        if courses_serializer.is_valid():
-            courses_serializer.save()
-            return JsonResponse("Cập nhật thông tin môn học thành công!", safe=False)
-        return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
-    elif request.method == 'DELETE':
-        courses=m.Course.objects.get(course_id=crid)
-        courses.delete()
-        return JsonResponse("Xóa môn học thành công!",safe=False)
+# @csrf_exempt        
+# def CourseAPI(request,crid=0):
+#     if request.method == 'GET':
+#         courses=m.Course.objects.all()
+#         courses_serializer=s.CourseWithIDSerializer(courses,many=True)
+#         return JsonResponse(courses_serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         courses_data=JSONParser().parse(request)
+#         courses_serializer=s.CourseSerializer(data=courses_data)
+#         if courses_serializer.is_valid():
+#             courses_serializer.save()
+#             return JsonResponse("Thêm môn học vào cơ sở dữ liệu thành công!",safe=False)
+#         return JsonResponse("Nhập thiếu trường thông tin, vui lòng nhập lại!",safe=False)
+#     elif request.method == 'PUT':
+#         courses_data=JSONParser().parse(request)
+#         courses=m.Course.objects.get(course_id=crid)
+#         courses_serializer=s.CourseSerializer(courses, data=courses_data)
+#         if courses_serializer.is_valid():
+#             courses_serializer.save()
+#             return JsonResponse("Cập nhật thông tin môn học thành công!", safe=False)
+#         return JsonResponse("Lỗi không cập nhật được thông tin!", safe=False)
+#     elif request.method == 'DELETE':
+#         courses=m.Course.objects.get(course_id=crid)
+#         courses.delete()
+#         return JsonResponse("Xóa môn học thành công!",safe=False)
 
 @csrf_exempt
 def CourseAndClass(request):
@@ -349,42 +349,42 @@ def ReportAPI(request, user_id=0): #This post method is currently not available 
             return JsonResponse({"message": "Report submitted successfully"}, status=201)
         return JsonResponse(serializer.errors, status=400)
     
-@csrf_exempt
-def SemesterAPI(request, sem_id=0):
-    if request.method == 'GET':
-        semesters=m.Semester.objects.all()
-        semesters_serializer=s.SemesterWithIDSerializer(semesters, many=True)
-        return JsonResponse(semesters_serializer.data, safe=False)
-    elif request.method == 'POST':
-        semesters_data = JSONParser().parse(request)
-        semesters_serializer=s.SemesterSerializer(data=semesters_data)
-        if semesters_serializer.is_valid():
-            semesters_serializer.save()
-            return JsonResponse({"message": "Semester created successfully"}, status=201)
-        return JsonResponse(semesters_serializer.errors, status=400)
-    elif request.method == 'PUT':
-        semesters_data = JSONParser().parse(request)
-        semesters=m.Semester.objects.get(semester_id=sem_id)
-        semesters_serializer=s.SemesterSerializer(semesters, data=semesters_data)
-        if semesters_serializer.is_valid():
-            semesters_serializer.save()
-            return JsonResponse("Cập nhật thông tin thành công!", safe=False)
-        return JsonResponse(semesters_serializer.errors, status=400)
-    elif request.method == 'DELETE':
-        semesters=m.Semester.objects.get(semester_id=sem_id)
-        semesters.delete()
-        return JsonResponse({"message": "Semester deleted successfully"}, status=204)
+# @csrf_exempt
+# def SemesterAPI(request, sem_id=0):
+#     if request.method == 'GET':
+#         semesters=m.Semester.objects.all()
+#         semesters_serializer=s.SemesterWithIDSerializer(semesters, many=True)
+#         return JsonResponse(semesters_serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         semesters_data = JSONParser().parse(request)
+#         semesters_serializer=s.SemesterSerializer(data=semesters_data)
+#         if semesters_serializer.is_valid():
+#             semesters_serializer.save()
+#             return JsonResponse({"message": "Semester created successfully"}, status=201)
+#         return JsonResponse(semesters_serializer.errors, status=400)
+#     elif request.method == 'PUT':
+#         semesters_data = JSONParser().parse(request)
+#         semesters=m.Semester.objects.get(semester_id=sem_id)
+#         semesters_serializer=s.SemesterSerializer(semesters, data=semesters_data)
+#         if semesters_serializer.is_valid():
+#             semesters_serializer.save()
+#             return JsonResponse("Cập nhật thông tin thành công!", safe=False)
+#         return JsonResponse(semesters_serializer.errors, status=400)
+#     elif request.method == 'DELETE':
+#         semesters=m.Semester.objects.get(semester_id=sem_id)
+#         semesters.delete()
+#         return JsonResponse({"message": "Semester deleted successfully"}, status=204)
 
-@csrf_exempt
-def SemesterPatchAPI(request, sem_id=0):
-    if request.method == 'PATCH':
-        try:
-            semesters=m.Semester.objects.get(semester_id=sem_id)
-            semesters.isActive = not semesters.isActive
-            semesters.save()
-            return JsonResponse("Cập nhật trạng thái thành công!", safe=False)
-        except m.Semester.DoesNotExist:
-            return JsonResponse({"error": "Semester not found"}, status=404)
+# @csrf_exempt
+# def SemesterPatchAPI(request, sem_id=0):
+#     if request.method == 'PATCH':
+#         try:
+#             semesters=m.Semester.objects.get(semester_id=sem_id)
+#             semesters.isActive = not semesters.isActive
+#             semesters.save()
+#             return JsonResponse("Cập nhật trạng thái thành công!", safe=False)
+#         except m.Semester.DoesNotExist:
+#             return JsonResponse({"error": "Semester not found"}, status=404)
     
 @csrf_exempt
 def ClassTimetableAPI(request, sid=0):

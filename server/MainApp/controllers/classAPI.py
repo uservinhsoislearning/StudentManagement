@@ -1,9 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-# from rest_framework.parsers import MultiPartParser, FormParser
 
-# import pandas as pd
 from MainApp.models import Class
 from MainApp.serializers import ClassSerializer, ClassWithTimetableSerializer, ClassWithCourseSerializer
 

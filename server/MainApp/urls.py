@@ -26,6 +26,15 @@ urlpatterns = [
     re_path(r'^api/classes/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)$', controllers.enrollmentAPI.EnrollmentController.as_view()),
 
+    # Semester CRUD
+    re_path(r'^api/semesters$', controllers.semesterAPI.SemesterController.as_view()),
+    re_path(r'^api/semesters/(?P<sem_id>\d+)$', controllers.semesterAPI.SemesterController.as_view()),
+    re_path(r'^api/semesters/(?P<sem_id>\d+)/toggle-status$', controllers.semesterAPI.SemesterController.as_view()),
+
+    # Course CRUD
+    re_path(r'^api/course-classes$', controllers.courseAPI.CourseController.as_view()),
+    re_path(r'^api/course-classes/(?P<crid>\d+)$', controllers.courseAPI.CourseController.as_view()),
+
     re_path(r'^api/classes/(?P<cid>\d+)/grades$', views.getGradeClass),
 
     re_path(r'^api/classes/([0-9]+)/get-students$', views.getStudentInClass),
@@ -33,18 +42,11 @@ urlpatterns = [
     re_path(r'^api/classes/([0-9]+)/assignments$', views.AssignmentAPI),
     re_path(r'^api/classes/([0-9]+)/assignments-file$', views.AssignmentFileAPI),
 
-    re_path(r'^api/course-classes$', views.CourseAPI),
-    re_path(r'^api/course-classes/(?P<crid>\d+)$', views.CourseAPI),
-
     re_path(r'^api/course-classes-both$', views.CourseAndClass),
             
     re_path(r'^api/course-classes/import$', views.CSVUploadCourse),
 
     re_path(r'^api/reports$', views.ReportAPI),
-
-    re_path(r'^api/semesters$', views.SemesterAPI),
-    re_path(r'^api/semesters/([0-9]+)$', views.SemesterAPI),
-    re_path(r'^api/semesters/([0-9]+)/toggle-status$', views.SemesterPatchAPI),
 
     re_path(r'^api/student/(?P<sid>\d+)/grades$', views.getGradeStudent),
 
