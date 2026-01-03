@@ -334,20 +334,20 @@ from MainApp import serializers as s
 #         except Exception as e:
 #             return JsonResponse({'error': str(e)})
         
-@csrf_exempt
-def ReportAPI(request, user_id=0): #This post method is currently not available (but it still exists to insert values into the tables)
-    if request.method == 'GET':
-        reports=m.Report.objects.filter(sender=user_id) if user_id != 0 else m.Report.objects.all()
-        serializer=s.ReportSerializer(reports, many=True)
-        return JsonResponse(serializer.data, safe=False)
-    elif request.method == 'POST':
-        reports_data = JSONParser().parse(request)
-        # reports_data['sender'] = user.user_id  # Inject sender into the data
-        serializer=s.ReportSerializer(data=reports_data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse({"message": "Report submitted successfully"}, status=201)
-        return JsonResponse(serializer.errors, status=400)
+# @csrf_exempt
+# def ReportAPI(request, user_id=0): #This post method is currently not available (but it still exists to insert values into the tables)
+#     if request.method == 'GET':
+#         reports=m.Report.objects.filter(sender=user_id) if user_id != 0 else m.Report.objects.all()
+#         serializer=s.ReportSerializer(reports, many=True)
+#         return JsonResponse(serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         reports_data = JSONParser().parse(request)
+#         # reports_data['sender'] = user.user_id  # Inject sender into the data
+#         serializer=s.ReportSerializer(data=reports_data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return JsonResponse({"message": "Report submitted successfully"}, status=201)
+#         return JsonResponse(serializer.errors, status=400)
     
 # @csrf_exempt
 # def SemesterAPI(request, sem_id=0):
@@ -497,20 +497,20 @@ def getRegistrated(request,sid=0):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt
-def getSummaryAdmin(request):
-    if request.method == 'GET':
-        total_students = m.Student.objects.count()
-        total_teachers = m.Teacher.objects.count()
-        reports_pending = m.Report.objects.filter(status='Pending').count()
+# @csrf_exempt
+# def getSummaryAdmin(request):
+#     if request.method == 'GET':
+#         total_students = m.Student.objects.count()
+#         total_teachers = m.Teacher.objects.count()
+#         reports_pending = m.Report.objects.filter(status='Pending').count()
 
-        dashboard = {
-            "totalStudents": total_students,
-            "totalTeachers": total_teachers,
-            "reportsPending": reports_pending
-        }
+#         dashboard = {
+#             "totalStudents": total_students,
+#             "totalTeachers": total_teachers,
+#             "reportsPending": reports_pending
+#         }
 
-        return JsonResponse(dashboard, safe=False)
+#         return JsonResponse(dashboard, safe=False)
     
 @csrf_exempt
 def EnrollmentScoreAPI(request, class_id=0, student_id=0):
@@ -773,12 +773,12 @@ def getMoreDetails(request, cid=0):
         except m.Class.DoesNotExist:
             return JsonResponse({'error': 'Class not found'}, status=404)
         
-@csrf_exempt
-def getSummaryTeacher(request, tid=0):
-    if request.method == "GET":
-        teacher = m.Teacher.objects.get(teacher_id=tid)
-        teacher_serializer = s.TeacherWithIDSerializer(teacher)
-        return JsonResponse(teacher_serializer.data, safe=False)
+# @csrf_exempt
+# def getSummaryTeacher(request, tid=0):
+#     if request.method == "GET":
+#         teacher = m.Teacher.objects.get(teacher_id=tid)
+#         teacher_serializer = s.TeacherWithIDSerializer(teacher)
+#         return JsonResponse(teacher_serializer.data, safe=False)
     
 # @csrf_exempt
 # def userLoginAPI(request):
@@ -922,39 +922,39 @@ def getSummaryTeacher(request, tid=0):
 #             return JsonResponse("Gửi bài tập thành công!", safe=False)
 #         return JsonResponse(work_serializer.errors, status=400)
 
-@csrf_exempt
-def getSummaryStudent(request, sid=0):
-    # Get enrolled classes
-    enrollments = m.Enrollment.objects.filter(student=sid)
-    course_ids = enrollments.values_list('class_field__course_id', flat=True).distinct()
-    enrolled_courses = course_ids.count()
+# @csrf_exempt
+# def getSummaryStudent(request, sid=0):
+#     # Get enrolled classes
+#     enrollments = m.Enrollment.objects.filter(student=sid)
+#     course_ids = enrollments.values_list('class_field__course_id', flat=True).distinct()
+#     enrolled_courses = course_ids.count()
 
-    # Upcoming exams (assignments in those classes)
-    class_ids = enrollments.values_list('class_field_id', flat=True)
-    now = timezone.now()
-    upcoming_exams = m.Assignment.objects.filter(
-        class_field_id__in=class_ids,
-        is_exam=True,
-        deadline__gte=now
-    ).count()
+#     # Upcoming exams (assignments in those classes)
+#     class_ids = enrollments.values_list('class_field_id', flat=True)
+#     now = timezone.now()
+#     upcoming_exams = m.Assignment.objects.filter(
+#         class_field_id__in=class_ids,
+#         is_exam=True,
+#         deadline__gte=now
+#     ).count()
 
-    # All relevant assignments from enrolled classes
-    all_assignments = m.Assignment.objects.filter(class_field_id__in=class_ids)
-    assignment_ids = all_assignments.values_list('id', flat=True)
+#     # All relevant assignments from enrolled classes
+#     all_assignments = m.Assignment.objects.filter(class_field_id__in=class_ids)
+#     assignment_ids = all_assignments.values_list('id', flat=True)
 
-    # Submitted assignments by the student
-    submitted_assignments = m.Work.objects.filter(student=sid, assignment_id__in=assignment_ids).values_list('assignment_id', flat=True).distinct()
+#     # Submitted assignments by the student
+#     submitted_assignments = m.Work.objects.filter(student=sid, assignment_id__in=assignment_ids).values_list('assignment_id', flat=True).distinct()
 
-    # Pending = total - submitted
-    assignments_pending = len(set(assignment_ids) - set(submitted_assignments))
+#     # Pending = total - submitted
+#     assignments_pending = len(set(assignment_ids) - set(submitted_assignments))
 
-    dashboard = {
-        "enrolledCourses": enrolled_courses,
-        "upcomingExams": upcoming_exams,
-        "assignmentsPending": assignments_pending
-    }
+#     dashboard = {
+#         "enrolledCourses": enrolled_courses,
+#         "upcomingExams": upcoming_exams,
+#         "assignmentsPending": assignments_pending
+#     }
 
-    return JsonResponse(dashboard, safe=False)
+#     return JsonResponse(dashboard, safe=False)
 
 # comment this after running 
 # @csrf_exempt

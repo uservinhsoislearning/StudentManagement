@@ -50,8 +50,6 @@ urlpatterns = [
     # Get grade student
     re_path(r'^api/student/(?P<sid>\d+)/grades$', controllers.studentAPI.StudentGradeController.as_view()),
 
-    re_path(r'^api/reports$', views.ReportAPI),
-
     # Get class's timetable
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
 
@@ -77,10 +75,13 @@ urlpatterns = [
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', controllers.workAPI.WorkController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', controllers.workAPI.WorkController.as_view()),
 
+    # Get and post reports
+    re_path(r'^api/reports$', controllers.miscAPI.ReportController.as_view()),
+
     # Get summary
-    re_path(r'^api/dashboard/admin$', views.getSummaryAdmin),
-    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
-    re_path(r'^api/dashboard/student/(?P<sid>\d+)$', views.getSummaryStudent)
+    re_path(r'^api/dashboard/admin$', controllers.miscAPI.AdminSummaryController.as_view()),
+    re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', controllers.teacherAPI.TeacherSummaryController.as_view()),
+    re_path(r'^api/dashboard/student/(?P<sid>\d+)$', controllers.studentAPI.StudentSummaryController.as_view())
 
     # re_path(r'^api/users', views.addUserAdmin),
     # re_path(r'^api/addAdmin', views.addAdmin)
