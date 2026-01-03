@@ -35,7 +35,7 @@ class ClassController(APIView):
             return Response("Không tìm thấy lớp!", status=status.HTTP_404_NOT_FOUND)
         
 class TimetableController(APIView):
-    def get(request, sid):
+    def get(self, request, sid):
         class_ids = Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
         classes = Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
         serializer = ClassWithTimetableSerializer(classes, many=True)

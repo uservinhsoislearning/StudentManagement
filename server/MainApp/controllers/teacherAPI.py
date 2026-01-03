@@ -35,7 +35,7 @@ class TeacherController(APIView):
             return Response("Không tìm thấy thầy/cô!", status=status.HTTP_404_NOT_FOUND)
         
 class TeacherSummaryController(APIView):
-    def get(request, tid):
+    def get(self, request, tid):
         try:
             teacher = Teacher.objects.get(teacher_id=tid)
             teacher_serializer = TeacherWithIDSerializer(teacher)

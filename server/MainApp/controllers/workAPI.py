@@ -6,7 +6,7 @@ from MainApp.models import Work
 from MainApp.serializers import WorkScoreSerializer, WorkSerializer
 
 class WorkController(APIView):
-    def get(request, cid, sid, aid):
+    def get(self, request, cid, sid, aid):
         try:
             work = Work.objects.filter(class_field=cid,assignment=aid,student=sid)
             work_serializer = WorkScoreSerializer(work, many=True)
@@ -14,7 +14,7 @@ class WorkController(APIView):
         except Work.DoesNotExist:
             return Response("Không có bài làm này!", status=status.HTTP_404_NOT_FOUND)
         
-    def post(request, cid, sid, aid):
+    def post(self, request, cid, sid, aid):
         if request.content_type.startswith("multipart/form-data"):
             work_data = {
                 "class_field": cid,
@@ -35,7 +35,7 @@ class WorkController(APIView):
             return Response("Gửi bài tập thành công!")
         return Response(work_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(request, cid, sid, aid):
+    def put(self, request, cid, sid, aid):
         try:
             work_data = request.data
             work_instance = Work.objects.get(class_field_id=cid, student_id=sid, assignment_id=aid)
@@ -52,7 +52,7 @@ class WorkController(APIView):
         except Exception as e:
             return Response("Error")
 
-    def delete(request, cid, sid, aid):
+    def delete(self, request, cid, sid, aid):
         if not cid or not sid or not aid:
             return Response("Thiếu thông tin trong URL!", safe=False)
         try:

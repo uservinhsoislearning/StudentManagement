@@ -37,13 +37,13 @@ class StudentController(APIView):
             return Response("Không tìm thấy học sinh!", status=status.HTTP_404_NOT_FOUND)
         
 class StudentGradeController(APIView):
-    def get(request, sid):
+    def get(self, request, sid):
         enrollment = Enrollment.objects.filter(student = sid)
         enrollment_serializer = EnrollmentGradeSubjectSerializer(enrollment,many=True)
         return Response(enrollment_serializer.data)
     
 class StudentSummaryController(APIView):
-    def get(request, sid):
+    def get(self, request, sid):
         enrollments = Enrollment.objects.filter(student=sid)
         course_ids = enrollments.values_list('class_field__course_id', flat=True).distinct()
         enrolled_courses = course_ids.count()

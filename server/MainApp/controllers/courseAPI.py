@@ -36,7 +36,7 @@ class CourseController(APIView):
         return Response("Xóa môn học thành công!")
 
 class CourseFileController(APIView):
-    def post(request):
+    def post(self, request):
         csv_file = request.FILES.get('file')
         if not csv_file:
             return Response("Không có file CSV!", status=status.HTTP_400_BAD_REQUEST)
@@ -79,7 +79,7 @@ class CourseFileController(APIView):
             return Response({'error': str(e)})
 
 class CourseClassController(APIView):
-    def get(request):
+    def get(self, request):
         course_list = []
         courses = Course.objects.all()
         for course in courses:

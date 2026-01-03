@@ -6,7 +6,7 @@ from MainApp.models import Student, Teacher, Report
 from MainApp.serializers import ReportSerializer
 
 class AdminSummaryController(APIView):
-    def get(request):
+    def get(self, request):
         total_students = Student.objects.count()
         total_teachers = Teacher.objects.count()
         reports_pending = Report.objects.filter(status='Pending').count()
@@ -20,12 +20,12 @@ class AdminSummaryController(APIView):
         return Response(dashboard)
     
 class ReportController(APIView):
-    def get(request, uid):
+    def get(self, request, uid):
         reports = Report.objects.filter(sender=uid) if uid != 0 else Report.objects.all()
         serializer = ReportSerializer(reports, many=True)
         return Response(serializer.data)
     
-    def post(request):
+    def post(self, request):
         reports_data = request.data
         serializer = ReportSerializer(data=reports_data)
         if serializer.is_valid():
