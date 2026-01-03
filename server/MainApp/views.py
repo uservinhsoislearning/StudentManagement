@@ -386,14 +386,14 @@ def ReportAPI(request, user_id=0): #This post method is currently not available 
 #         except m.Semester.DoesNotExist:
 #             return JsonResponse({"error": "Semester not found"}, status=404)
     
-@csrf_exempt
-def ClassTimetableAPI(request, sid=0):
-    if request.method == 'GET':
-        class_ids=m.Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
-        classes=m.Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
+# @csrf_exempt
+# def ClassTimetableAPI(request, sid=0):
+#     if request.method == 'GET':
+#         class_ids=m.Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
+#         classes=m.Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
 
-        serializer=s.ClassWithTimetableSerializer(classes, many=True)
-        return JsonResponse(serializer.data, safe=False)
+#         serializer=s.ClassWithTimetableSerializer(classes, many=True)
+#         return JsonResponse(serializer.data, safe=False)
     
 @csrf_exempt
 def MessageAPI(request, user1_id, user2_id):
@@ -693,40 +693,40 @@ def sendAttendance(request, cid=0):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
         
-@csrf_exempt
-def gradeWorkAPI(request,cid=0,sid=0,aid=0):
-    if request.method == 'PUT':
-        try:
-            # Step 1: Parse request data
-            work_data = JSONParser().parse(request)
+# @csrf_exempt
+# def gradeWorkAPI(request,cid=0,sid=0,aid=0):
+#     if request.method == 'PUT':
+#         try:
+#             # Step 1: Parse request data
+#             work_data = JSONParser().parse(request)
 
-            # Step 2: Find the specific Work record
-            work_instance = m.Work.objects.get(class_field_id=cid, student_id=sid, assignment_id=aid)
+#             # Step 2: Find the specific Work record
+#             work_instance = m.Work.objects.get(class_field_id=cid, student_id=sid, assignment_id=aid)
 
-            # Step 3: Create serializer and update score
-            work_serializer = s.WorkScoreSerializer(work_instance, data={'score': work_data['score']}, partial=True)
+#             # Step 3: Create serializer and update score
+#             work_serializer = s.WorkScoreSerializer(work_instance, data={'score': work_data['score']}, partial=True)
 
-            if work_serializer.is_valid():
-                work_serializer.save()
-                return JsonResponse(work_serializer.data, safe=False)
-            else:
-                return JsonResponse(work_serializer.errors, status=400)
+#             if work_serializer.is_valid():
+#                 work_serializer.save()
+#                 return JsonResponse(work_serializer.data, safe=False)
+#             else:
+#                 return JsonResponse(work_serializer.errors, status=400)
 
-        except m.Work.DoesNotExist:
-            return JsonResponse({'error': 'Work entry not found.'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+#         except m.Work.DoesNotExist:
+#             return JsonResponse({'error': 'Work entry not found.'}, status=404)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
 
-    # DELETE request: delete the work entry
-    elif request.method == 'DELETE':
-        if cid == 0 or sid == 0 or aid == 0:
-            return JsonResponse("Thiếu thông tin trong URL!", safe=False)
-        try:
-            work = m.Work.objects.get(class_field=cid, student=sid, assignment=aid)
-            work.delete()
-            return JsonResponse("Work entry deleted successfully", safe=False)
-        except m.Work.DoesNotExist:
-            return JsonResponse("Không có bài làm này!", safe=False)
+#     # DELETE request: delete the work entry
+#     elif request.method == 'DELETE':
+#         if cid == 0 or sid == 0 or aid == 0:
+#             return JsonResponse("Thiếu thông tin trong URL!", safe=False)
+#         try:
+#             work = m.Work.objects.get(class_field=cid, student=sid, assignment=aid)
+#             work.delete()
+#             return JsonResponse("Work entry deleted successfully", safe=False)
+#         except m.Work.DoesNotExist:
+#             return JsonResponse("Không có bài làm này!", safe=False)
         
 @csrf_exempt
 def getClassStats(request, cid=0):
@@ -895,32 +895,32 @@ def getSummaryTeacher(request, tid=0):
 #             "relatedid": user.relatedid
 #         })
     
-@csrf_exempt
-def submitWork(request, cid=0, aid=0, sid=0):
-    if request.method == 'GET':
-        work = m.Work.objects.filter(class_field=cid,assignment=aid,student=sid)
-        work_serializer = s.WorkScoreSerializer(work, many=True)
-        return JsonResponse(work_serializer.data, safe=False)
-    elif request.method == 'POST':
-        if request.content_type.startswith("multipart/form-data"):
-            work_data = {
-                "class_field": cid,
-                "assignment": aid,
-                "student": sid,
-                "text_content": request.POST.get("text_content", ""),
-                "file": request.FILES.get("file")
-            }
-        else:
-            work_data = JSONParser().parse(request)
-            work_data["class_field"] = cid
-            work_data["assignment"] = aid
-            work_data["student"] = sid
+# @csrf_exempt
+# def submitWork(request, cid=0, aid=0, sid=0):
+#     if request.method == 'GET':
+#         work = m.Work.objects.filter(class_field=cid,assignment=aid,student=sid)
+#         work_serializer = s.WorkScoreSerializer(work, many=True)
+#         return JsonResponse(work_serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         if request.content_type.startswith("multipart/form-data"):
+#             work_data = {
+#                 "class_field": cid,
+#                 "assignment": aid,
+#                 "student": sid,
+#                 "text_content": request.POST.get("text_content", ""),
+#                 "file": request.FILES.get("file")
+#             }
+#         else:
+#             work_data = JSONParser().parse(request)
+#             work_data["class_field"] = cid
+#             work_data["assignment"] = aid
+#             work_data["student"] = sid
 
-        work_serializer = s.WorkSerializer(data=work_data)
-        if work_serializer.is_valid():
-            work_serializer.save()
-            return JsonResponse("Gửi bài tập thành công!", safe=False)
-        return JsonResponse(work_serializer.errors, status=400)
+#         work_serializer = s.WorkSerializer(data=work_data)
+#         if work_serializer.is_valid():
+#             work_serializer.save()
+#             return JsonResponse("Gửi bài tập thành công!", safe=False)
+#         return JsonResponse(work_serializer.errors, status=400)
 
 @csrf_exempt
 def getSummaryStudent(request, sid=0):

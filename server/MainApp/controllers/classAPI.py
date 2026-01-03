@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from MainApp.models import Class
+from MainApp.models import Class, Enrollment
 from MainApp.serializers import ClassSerializer, ClassWithTimetableSerializer, ClassWithCourseSerializer
 
 class ClassController(APIView):
@@ -33,3 +33,10 @@ class ClassController(APIView):
             return Response("Xóa lớp thành công!")
         except Class.DoesNotExist:
             return Response("Không tìm thấy lớp!", status=status.HTTP_404_NOT_FOUND)
+        
+class TimetableController(APIView):
+    def get(request, sid):
+        class_ids = Enrollment.objects.filter(student_id=sid).values_list('class_field_id', flat=True)
+        classes = Class.objects.filter(class_id__in=class_ids).prefetch_related('timetables')
+        serializer = ClassWithTimetableSerializer(classes, many=True)
+        return Response(serializer.data)

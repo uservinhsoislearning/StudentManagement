@@ -6,4 +6,5 @@ from .enrollmentAPI import *
 from .courseAPI import *
 from .semesterAPI import *
 from .assignmentAPI import *
+from .workAPI import *
 from .miscAPI import *

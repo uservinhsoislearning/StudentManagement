@@ -35,7 +35,7 @@ urlpatterns = [
     re_path(r'^api/course-classes$', controllers.courseAPI.CourseController.as_view()),
     re_path(r'^api/course-classes/(?P<crid>\d+)$', controllers.courseAPI.CourseController.as_view()),
     re_path(r'^api/course-classes/import$', controllers.courseAPI.CourseFileController.as_view()),
-    
+
     # Grade from student
     re_path(r'^api/classes/(?P<cid>\d+)/grades$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/get-students$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
@@ -52,7 +52,8 @@ urlpatterns = [
 
     re_path(r'^api/reports$', views.ReportAPI),
 
-    re_path(r'^api/student/(?P<sid>\d+)/schedule$', views.ClassTimetableAPI),
+    # Get class's timetable
+    re_path(r'^api/student/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
 
     re_path(r'^api/messages$', views.MessageAPI),
     re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', views.MessageAPI),
@@ -72,9 +73,9 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<cid>\d+)/details$', views.getMoreDetails),
 
-    re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', views.gradeWorkAPI),
-
-    re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', views.submitWork),
+    # Work ((Student) get, submit(post) and (Teacher) grading and delete )
+    re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', controllers.workAPI.WorkController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', controllers.workAPI.WorkController.as_view()),
 
     # Get summary
     re_path(r'^api/dashboard/admin$', views.getSummaryAdmin),
