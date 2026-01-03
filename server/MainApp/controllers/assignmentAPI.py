@@ -4,6 +4,7 @@ from rest_framework import status
 
 from MainApp.models import Assignment
 from MainApp.serializers import AssignmentSerializer, AssignmentWithIDSerializer
+
 class AssignmentController(APIView):
     def get(self, request, cid):
         assignments = Assignment.objects.filter(class_field = cid)

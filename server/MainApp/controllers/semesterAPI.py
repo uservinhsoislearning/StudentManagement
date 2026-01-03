@@ -4,6 +4,7 @@ from rest_framework import status
 
 from MainApp.models import Semester
 from MainApp.serializers import SemesterWithIDSerializer, SemesterSerializer
+
 class SemesterController(APIView):
     def get(self, request):
         semesters = Semester.objects.all()

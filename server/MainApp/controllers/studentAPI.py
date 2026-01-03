@@ -44,7 +44,7 @@ class StudentGradeController(APIView):
     
 class StudentSummaryController(APIView):
     def get(self, request, sid):
-        enrollments = Enrollment.objects.filter(student=sid)
+        enrollments = Enrollment.objects.filter(student = sid)
         course_ids = enrollments.values_list('class_field__course_id', flat=True).distinct()
         enrolled_courses = course_ids.count()
 
@@ -59,7 +59,7 @@ class StudentSummaryController(APIView):
 
         # All relevant assignments from enrolled classes
         all_assignments = Assignment.objects.filter(class_field_id__in=class_ids)
-        assignment_ids = all_assignments.values_list('id', flat=True)
+        assignment_ids = all_assignments.values_list('assignment_id', flat=True)
 
         # Submitted assignments by the student
         submitted_assignments = Work.objects.filter(student=sid, assignment_id__in=assignment_ids).values_list('assignment_id', flat=True).distinct()
@@ -73,4 +73,4 @@ class StudentSummaryController(APIView):
             "assignmentsPending": assignments_pending
         }
 
-        return Response(dashboard, safe=False)
+        return Response(dashboard)

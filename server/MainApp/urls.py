@@ -41,7 +41,7 @@ urlpatterns = [
     re_path(r'^api/classes/(?P<cid>\d+)/get-students$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
 
     # Assignment CRUD
-    re_path(r'^api/classes/((?P<cid>\d+)/assignments$', controllers.assignmentAPI.AssignmentController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/assignments$', controllers.assignmentAPI.AssignmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/assignments-file$', controllers.assignmentAPI.AssignmentFileController.as_view()),
 
     # Course-Class
@@ -53,8 +53,9 @@ urlpatterns = [
     # Get class's timetable
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
 
-    re_path(r'^api/messages$', views.MessageAPI),
-    re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', views.MessageAPI),
+    # Send messages
+    re_path(r'^api/messages$', controllers.miscAPI.MessageController.as_view()),
+    re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', controllers.miscAPI.MessageController.as_view()),
 
     re_path(r'^api/registrations/(?P<cid>\d+)/student/(?P<sid>\d+)$', views.registrationAPI),
 

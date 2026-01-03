@@ -69,7 +69,7 @@ const Assignments = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <Button onClick={handleLoadClassAssignments}>Tải bài tập</Button>
+        <Button onClick={handleLoadClassAssignments}>Tìm kiếm</Button>
       </div>
 
       {selectedClass && groupedByClass[selectedClass] && (

@@ -395,51 +395,51 @@ from MainApp import serializers as s
 #         serializer=s.ClassWithTimetableSerializer(classes, many=True)
 #         return JsonResponse(serializer.data, safe=False)
     
-@csrf_exempt
-def MessageAPI(request, user1_id, user2_id):
-    if request.method == 'GET':
-        try:
-            messages_user1_to_user2=m.Message.objects.filter(
-                sender_id=user1_id, receiver_id=user2_id
-            )
-            # Get messages from user2 to user1
-            messages_user2_to_user1=m.Message.objects.filter(
-                sender_id=user2_id, receiver_id=user1_id
-            )
-            # Combine the two querysets
-            all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
+# @csrf_exempt
+# def MessageAPI(request, user1_id, user2_id):
+#     if request.method == 'GET':
+#         try:
+#             messages_user1_to_user2=m.Message.objects.filter(
+#                 sender_id=user1_id, receiver_id=user2_id
+#             )
+#             # Get messages from user2 to user1
+#             messages_user2_to_user1=m.Message.objects.filter(
+#                 sender_id=user2_id, receiver_id=user1_id
+#             )
+#             # Combine the two querysets
+#             all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
 
-            serializer=s.MessageSerializer(all_messages, many=True)
-            return JsonResponse(serializer.data)
+#             serializer=s.MessageSerializer(all_messages, many=True)
+#             return JsonResponse(serializer.data)
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    elif request.method == 'POST':
-        try:
-            sender_id = request.data.get('sender_id')
-            receiver_id = request.data.get('receiver_id')
-            content = request.data.get('content')
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
+#     elif request.method == 'POST':
+#         try:
+#             sender_id = request.data.get('sender_id')
+#             receiver_id = request.data.get('receiver_id')
+#             content = request.data.get('content')
 
-            if not all([sender_id, receiver_id, content]):
-                return JsonResponse({'error': 'Missing required fields.'}, status=400)
+#             if not all([sender_id, receiver_id, content]):
+#                 return JsonResponse({'error': 'Missing required fields.'}, status=400)
 
-            sender = m.Userlogin.objects.get(user_id=sender_id)
-            receiver = m.Userlogin.objects.get(user_id=receiver_id)
+#             sender = m.Userlogin.objects.get(user_id=sender_id)
+#             receiver = m.Userlogin.objects.get(user_id=receiver_id)
 
-            message=m.Message.objects.create(
-                sender=sender,
-                receiver=receiver,
-                content=content,
-                timestamp=timezone.now()
-            )
+#             message=m.Message.objects.create(
+#                 sender=sender,
+#                 receiver=receiver,
+#                 content=content,
+#                 timestamp=timezone.now()
+#             )
 
-            message_serializer=s.MessageSerializer(message)
-            return JsonResponse(message_serializer.data, safe=False)
+#             message_serializer=s.MessageSerializer(message)
+#             return JsonResponse(message_serializer.data, safe=False)
 
-        except m.Userlogin.DoesNotExist:
-            return JsonResponse({'error': 'User not found.'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+#         except m.Userlogin.DoesNotExist:
+#             return JsonResponse({'error': 'User not found.'}, status=404)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def registrationAPI(request, sid=0, cid=0):
