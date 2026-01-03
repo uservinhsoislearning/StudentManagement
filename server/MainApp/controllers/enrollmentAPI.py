@@ -2,10 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.core.mail import EmailMultiAlternatives
 from django.db.models import F, ExpressionWrapper, DurationField
 from django.db.models.functions import Now, Extract
+from django.template.loader import render_to_string
+import server.settings as settings
 
-from MainApp.models import Enrollment, Attendance, Class
+from MainApp.models import Enrollment, Attendance, Class, Student
 from MainApp.serializers import EnrollmentSerializer, EnrollmentGradeSerializer, StudentWithIDSerializer, AttendanceSerializer
 
 class EnrollmentController(APIView):
@@ -129,8 +132,82 @@ class AttendanceController(APIView):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class SendAttendanceController(APIView):
-    # ... [Logic] ...
-    pass
+    def post(self, request, cid):
+        try:
+            closest = (
+                Attendance.objects.filter(class_field_id=cid)
+                .annotate(
+                    time_diff=ExpressionWrapper(
+                        Now() - F('timestamp'),
+                        output_field=DurationField()
+                    )
+                )
+                .annotate(
+                    seconds_diff=Extract(F('time_diff'), 'epoch')
+                )
+                .order_by('seconds_diff')
+                .values('timestamp__date')
+                .first()
+            )
+
+            if not closest:
+                return Response("Không có bản ghi điểm danh nào để gửi!", status=status.HTTP_404_NOT_FOUND)
+
+            closest_date = closest['timestamp__date']
+
+            absent_records = Attendance.objects.filter(
+                class_field_id=cid,
+                timestamp__date=closest_date,
+                is_present=False
+            )
+
+            if not absent_records.exists():
+                return Response("Không có học sinh nào vắng vào ngày gần nhất!")
+
+            emails_sent = []
+            class_data = Class.objects.get(class_id=cid)
+            teacher = class_data.class_teacher
+
+            for record in absent_records:
+                try:
+                    sid = record.student
+                    student = Student.objects.get(student_id=sid)
+                    parent_email = student.parent_email
+                    if not parent_email:
+                        print(f"Skipping student {student.student_name}: No parent_email found.")
+                        continue
+                    subject = "Thông báo vắng mặt"
+
+                    html_message = render_to_string('absent.html', {
+                        'student_name': student.student_name,
+                        'class_name': class_data.class_name,
+                        'date': closest_date,
+                        'teacher_email': teacher.teacher_email
+                    })
+
+                    plain_message = (
+                        f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
+                        f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
+                    )
+
+                    from_email = settings.EMAIL_HOST_USER
+
+                    email = EmailMultiAlternatives(subject, plain_message, from_email, parent_email)
+                    email.attach_alternative(html_message, "text/html")
+                    email.send()
+                    emails_sent.append(parent_email) # for debugging
+
+                except Exception as e:
+                    print(f"Error processing student ID {record.student}: {e}")
+                    continue
+
+            return Response({ # for debugging
+                "message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!",
+                "recipients": emails_sent
+            })
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class EnrollmentScoreController(APIView):
     def get(self, request, cid):

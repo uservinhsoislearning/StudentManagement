@@ -614,84 +614,84 @@ def EnrollmentScoreAPI(request, class_id=0, student_id=0):
 #             return JsonResponse({"error": str(e)}, status=500)
 
 # FIX THIS BECAUSE RELATING TO PARENT
-@csrf_exempt
-def sendAttendance(request, cid=0):
-    if request.method == 'POST':
-        try:
-            closest = (
-                m.Attendance.objects.filter(class_field_id=cid)
-                .annotate(
-                    time_diff=ExpressionWrapper(
-                        Now() - F('timestamp'),
-                        output_field=DurationField()
-                    )
-                )
-                .annotate(
-                    seconds_diff=Extract(F('time_diff'), 'epoch')
-                )
-                .order_by('seconds_diff')
-                .values('timestamp__date')
-                .first()
-            )
+# @csrf_exempt
+# def sendAttendance(request, cid=0):
+#     if request.method == 'POST':
+#         try:
+#             closest = (
+#                 m.Attendance.objects.filter(class_field_id=cid)
+#                 .annotate(
+#                     time_diff=ExpressionWrapper(
+#                         Now() - F('timestamp'),
+#                         output_field=DurationField()
+#                     )
+#                 )
+#                 .annotate(
+#                     seconds_diff=Extract(F('time_diff'), 'epoch')
+#                 )
+#                 .order_by('seconds_diff')
+#                 .values('timestamp__date')
+#                 .first()
+#             )
 
-            if not closest:
-                return JsonResponse({"error": "Không có bản ghi điểm danh nào để gửi!"}, status=404)
+#             if not closest:
+#                 return JsonResponse({"error": "Không có bản ghi điểm danh nào để gửi!"}, status=404)
 
-            closest_date = closest['timestamp__date']
+#             closest_date = closest['timestamp__date']
 
-            absent_records = m.Attendance.objects.filter(
-                class_field_id=cid,
-                timestamp__date=closest_date,
-                is_present=False
-            )
+#             absent_records = m.Attendance.objects.filter(
+#                 class_field_id=cid,
+#                 timestamp__date=closest_date,
+#                 is_present=False
+#             )
 
-            if not absent_records.exists():
-                return JsonResponse("Không có học sinh nào vắng vào ngày gần nhất!", safe=False)
+#             if not absent_records.exists():
+#                 return JsonResponse("Không có học sinh nào vắng vào ngày gần nhất!", safe=False)
 
-            emails_sent = []
-            class_data = m.Class.objects.get(class_id=cid)
-            teacher = class_data.class_teacher
+#             emails_sent = []
+#             class_data = m.Class.objects.get(class_id=cid)
+#             teacher = class_data.class_teacher
 
-            for record in absent_records:
-                try:
-                    sid = record.student
-                    student = m.Student.objects.get(student_id=sid)
-                    parent_email = student.parent_email
-                    if not parent_email:
-                        print(f"Skipping student {student.student_name}: No parent_email found.")
-                        continue
-                    subject = "Thông báo vắng mặt"
+#             for record in absent_records:
+#                 try:
+#                     sid = record.student
+#                     student = m.Student.objects.get(student_id=sid)
+#                     parent_email = student.parent_email
+#                     if not parent_email:
+#                         print(f"Skipping student {student.student_name}: No parent_email found.")
+#                         continue
+#                     subject = "Thông báo vắng mặt"
 
-                    html_message = render_to_string('absent.html', {
-                        'student_name': student.student_name,
-                        'class_name': class_data.class_name,
-                        'date': closest_date,
-                        'teacher_email': teacher.teacher_email
-                    })
+#                     html_message = render_to_string('absent.html', {
+#                         'student_name': student.student_name,
+#                         'class_name': class_data.class_name,
+#                         'date': closest_date,
+#                         'teacher_email': teacher.teacher_email
+#                     })
 
-                    plain_message = (
-                        f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
-                        f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
-                    )
+#                     plain_message = (
+#                         f"Học sinh {student.student_name} đã vắng mặt buổi học vào ngày {closest_date}, "
+#                         f"lớp {class_data.class_name}. Email liên hệ giáo viên: {teacher.teacher_email}"
+#                     )
 
-                    from_email = settings.EMAIL_HOST_USER
+#                     from_email = settings.EMAIL_HOST_USER
 
-                    email = EmailMultiAlternatives(subject, plain_message, from_email, parent_email)
-                    email.attach_alternative(html_message, "text/html")
-                    email.send()
-                    emails_sent.append(parent_email) # for debugging
+#                     email = EmailMultiAlternatives(subject, plain_message, from_email, parent_email)
+#                     email.attach_alternative(html_message, "text/html")
+#                     email.send()
+#                     emails_sent.append(parent_email) # for debugging
 
-                except Exception as e:
-                    print(f"Error processing student ID {record.student}: {e}")
-                    continue
+#                 except Exception as e:
+#                     print(f"Error processing student ID {record.student}: {e}")
+#                     continue
 
-            return JsonResponse({ # for debugging
-                "message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!",
-                "recipients": emails_sent
-            })
+#             return JsonResponse({ # for debugging
+#                 "message": "Email đã được gửi đến phụ huynh học sinh vắng mặt!",
+#                 "recipients": emails_sent
+#             })
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+#         except Exception as e:
+#             return JsonResponse({"error": str(e)}, status=500)
         
 # @csrf_exempt
 # def gradeWorkAPI(request,cid=0,sid=0,aid=0):
