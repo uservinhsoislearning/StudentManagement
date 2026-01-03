@@ -39,8 +39,9 @@ urlpatterns = [
 
     re_path(r'^api/classes/([0-9]+)/get-students$', views.getStudentInClass),
 
-    re_path(r'^api/classes/([0-9]+)/assignments$', views.AssignmentAPI),
-    re_path(r'^api/classes/([0-9]+)/assignments-file$', views.AssignmentFileAPI),
+    # Assignment CRUD
+    re_path(r'^api/classes/((?P<cid>\d+)/assignments$', controllers.assignmentAPI.AssignmentController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/assignments-file$', controllers.assignmentAPI.AssignmentFileController.as_view()),
 
     re_path(r'^api/course-classes-both$', views.CourseAndClass),
             
@@ -51,8 +52,6 @@ urlpatterns = [
     re_path(r'^api/student/(?P<sid>\d+)/grades$', views.getGradeStudent),
 
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', views.ClassTimetableAPI),
-
-    re_path(r'^api/dashboard/admin$', views.getSummaryAdmin),
 
     re_path(r'^api/messages$', views.MessageAPI),
     re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', views.MessageAPI),
@@ -77,6 +76,7 @@ urlpatterns = [
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/assignment/(?P<aid>\d+)$', views.submitWork),
 
     # Get summary
+    re_path(r'^api/dashboard/admin$', views.getSummaryAdmin),
     re_path(r'^api/dashboard/teacher/(?P<tid>\d+)$', views.getSummaryTeacher),
     re_path(r'^api/dashboard/student/(?P<sid>\d+)$', views.getSummaryStudent)
 

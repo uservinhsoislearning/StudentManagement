@@ -162,64 +162,64 @@ def getGradeStudent(request, sid=0):
         enrollment_serializer=s.EnrollmentGradeSubjectSerializer(enrollment,many=True)
         return JsonResponse(enrollment_serializer.data, safe=False)
         
-@csrf_exempt
-def AssignmentAPI(request, id=0):
-    if request.method == 'GET':
-        assignments=m.Assignment.objects.filter(class_field = id)
-        assignments_serializer=s.AssignmentWithIDSerializer(assignments,many=True)
-        return JsonResponse(assignments_serializer.data, safe=False)
-    elif request.method == 'POST':
-        assignments_data=JSONParser().parse(request)
-        assignments_data['class_field'] = id
-        assignments_data['file'] = None
-        assignments_serializer=s.AssignmentSerializer(data=assignments_data)
-        if assignments_serializer.is_valid():
-            assignments_serializer.save()
-            return JsonResponse("Thêm bài tập thành công!",safe=False)
-        return JsonResponse(
-        {"error": "Dữ liệu không hợp lệ.", "details": assignments_serializer.errors},
-        status=400
-    )
-    elif request.method == 'PUT':
-        assignments_data=JSONParser().parse(request)
-        assignments=m.Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
-        try:
-            assignments_serializer=s.AssignmentSerializer(assignments, data=assignments_data,class_field = id)
-        except m.Assignment.DoesNotExist:
-            return JsonResponse("Không tìm thấy bài tập cho lớp này!", safe=False)
-        if assignments_serializer.is_valid():
-            assignments_serializer.save()
-            return JsonResponse("Cập nhật bài tập thành công!", safe=False)
-        return JsonResponse("Lỗi không cập nhật được bài tập!", safe=False)
-    elif request.method == 'DELETE':
-        assignments=m.Assignment.objects.get(class_id=id)
-        assignments.delete()
-        return JsonResponse("Xóa bài tập thành công!",safe=False)
+# @csrf_exempt
+# def AssignmentAPI(request, id=0):
+#     if request.method == 'GET':
+#         assignments=m.Assignment.objects.filter(class_field = id)
+#         assignments_serializer=s.AssignmentWithIDSerializer(assignments,many=True)
+#         return JsonResponse(assignments_serializer.data, safe=False)
+#     elif request.method == 'POST':
+#         assignments_data=JSONParser().parse(request)
+#         assignments_data['class_field'] = id
+#         assignments_data['file'] = None
+#         assignments_serializer=s.AssignmentSerializer(data=assignments_data)
+#         if assignments_serializer.is_valid():
+#             assignments_serializer.save()
+#             return JsonResponse("Thêm bài tập thành công!",safe=False)
+#         return JsonResponse(
+#         {"error": "Dữ liệu không hợp lệ.", "details": assignments_serializer.errors},
+#         status=400
+#     )
+#     elif request.method == 'PUT':
+#         assignments_data=JSONParser().parse(request)
+#         assignments=m.Assignment.objects.get(assignment_id = assignments_data['assignment_id'])
+#         try:
+#             assignments_serializer=s.AssignmentSerializer(assignments, data=assignments_data,class_field = id)
+#         except m.Assignment.DoesNotExist:
+#             return JsonResponse("Không tìm thấy bài tập cho lớp này!", safe=False)
+#         if assignments_serializer.is_valid():
+#             assignments_serializer.save()
+#             return JsonResponse("Cập nhật bài tập thành công!", safe=False)
+#         return JsonResponse("Lỗi không cập nhật được bài tập!", safe=False)
+#     elif request.method == 'DELETE':
+#         assignments=m.Assignment.objects.get(class_id=id)
+#         assignments.delete()
+#         return JsonResponse("Xóa bài tập thành công!",safe=False)
 
-@csrf_exempt
-def AssignmentFileAPI(request,id=0):
-    if request.method == "POST":
-        try:
-            # Copy POST data and add the class_field
-            assignments_data = request.POST.copy()
-            assignments_data['class_field'] = id  # Foreign key to Class
+# @csrf_exempt
+# def AssignmentFileAPI(request,id=0):
+#     if request.method == "POST":
+#         try:
+#             # Copy POST data and add the class_field
+#             assignments_data = request.POST.copy()
+#             assignments_data['class_field'] = id  # Foreign key to Class
 
-            # Handle uploaded file
-            if 'file' in request.FILES:
-                assignments_data['file'] = request.FILES['file']
-            else:
-                return JsonResponse({'error': 'No file uploaded.'}, status=400)
+#             # Handle uploaded file
+#             if 'file' in request.FILES:
+#                 assignments_data['file'] = request.FILES['file']
+#             else:
+#                 return JsonResponse({'error': 'No file uploaded.'}, status=400)
 
-            # Include the file in serializer's files argument
-            assignments_serializer = s.AssignmentSerializer(data=assignments_data)
-            if assignments_serializer.is_valid():
-                assignments_serializer.save()
-                return JsonResponse({'message': 'Assignment uploaded successfully.'}, status=201)
-            else:
-                return JsonResponse({'error': assignments_serializer.errors}, status=400)
+#             # Include the file in serializer's files argument
+#             assignments_serializer = s.AssignmentSerializer(data=assignments_data)
+#             if assignments_serializer.is_valid():
+#                 assignments_serializer.save()
+#                 return JsonResponse({'message': 'Assignment uploaded successfully.'}, status=201)
+#             else:
+#                 return JsonResponse({'error': assignments_serializer.errors}, status=400)
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)}, status=500)
 
 # @csrf_exempt        
 # def CourseAPI(request,crid=0):
