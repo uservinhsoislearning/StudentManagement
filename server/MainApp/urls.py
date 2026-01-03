@@ -34,22 +34,23 @@ urlpatterns = [
     # Course CRUD
     re_path(r'^api/course-classes$', controllers.courseAPI.CourseController.as_view()),
     re_path(r'^api/course-classes/(?P<crid>\d+)$', controllers.courseAPI.CourseController.as_view()),
-
-    re_path(r'^api/classes/(?P<cid>\d+)/grades$', views.getGradeClass),
-
-    re_path(r'^api/classes/([0-9]+)/get-students$', views.getStudentInClass),
+    re_path(r'^api/course-classes/import$', controllers.courseAPI.CourseFileController.as_view()),
+    
+    # Grade from student
+    re_path(r'^api/classes/(?P<cid>\d+)/grades$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/get-students$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
 
     # Assignment CRUD
     re_path(r'^api/classes/((?P<cid>\d+)/assignments$', controllers.assignmentAPI.AssignmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/assignments-file$', controllers.assignmentAPI.AssignmentFileController.as_view()),
 
-    re_path(r'^api/course-classes-both$', views.CourseAndClass),
-            
-    re_path(r'^api/course-classes/import$', views.CSVUploadCourse),
+    # Course-Class
+    re_path(r'^api/course-classes-both$', controllers.courseAPI.CourseClassController.as_view()),
+
+    # Get grade student
+    re_path(r'^api/student/(?P<sid>\d+)/grades$', controllers.studentAPI.StudentGradeController.as_view()),
 
     re_path(r'^api/reports$', views.ReportAPI),
-
-    re_path(r'^api/student/(?P<sid>\d+)/grades$', views.getGradeStudent),
 
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', views.ClassTimetableAPI),
 

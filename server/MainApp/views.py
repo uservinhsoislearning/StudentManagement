@@ -137,30 +137,30 @@ from MainApp import serializers as s
 #         except m.Enrollment.DoesNotExist:
 #             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
-@csrf_exempt
-def getGradeClass(request, cid=0):
-    if request.method == 'GET':
-        enrollment=m.Enrollment.objects.filter(class_field = cid)
-        enrollment_serializer=s.EnrollmentGradeSerializer(enrollment,many=True)
-        return JsonResponse(enrollment_serializer.data, safe=False)
+# @csrf_exempt
+# def getGradeClass(request, cid=0):
+#     if request.method == 'GET':
+#         enrollment=m.Enrollment.objects.filter(class_field = cid)
+#         enrollment_serializer=s.EnrollmentGradeSerializer(enrollment,many=True)
+#         return JsonResponse(enrollment_serializer.data, safe=False)
 
-@csrf_exempt
-def getStudentInClass(request, id=0):
-    if request.method == 'POST':
-        try:
-            enrollment=m.Enrollment.objects.filter(class_field_id=id)
-            students = [cs.student for cs in enrollment]
-            students_serializer=s.StudentWithIDSerializer(students, many=True)
-            return JsonResponse(students_serializer.data, safe=False)
-        except m.Enrollment.DoesNotExist:
-            return JsonResponse("Không tìm được lớp!")
+# @csrf_exempt
+# def getStudentInClass(request, id=0):
+#     if request.method == 'POST':
+#         try:
+#             enrollment=m.Enrollment.objects.filter(class_field_id=id)
+#             students = [cs.student for cs in enrollment]
+#             students_serializer=s.StudentWithIDSerializer(students, many=True)
+#             return JsonResponse(students_serializer.data, safe=False)
+#         except m.Enrollment.DoesNotExist:
+#             return JsonResponse("Không tìm được lớp!")
         
-@csrf_exempt
-def getGradeStudent(request, sid=0):
-    if request.method == 'GET':
-        enrollment=m.Enrollment.objects.filter(student = sid)
-        enrollment_serializer=s.EnrollmentGradeSubjectSerializer(enrollment,many=True)
-        return JsonResponse(enrollment_serializer.data, safe=False)
+# @csrf_exempt
+# def getGradeStudent(request, sid=0):
+#     if request.method == 'GET':
+#         enrollment=m.Enrollment.objects.filter(student = sid)
+#         enrollment_serializer=s.EnrollmentGradeSubjectSerializer(enrollment,many=True)
+#         return JsonResponse(enrollment_serializer.data, safe=False)
         
 # @csrf_exempt
 # def AssignmentAPI(request, id=0):
@@ -247,92 +247,92 @@ def getGradeStudent(request, sid=0):
 #         courses.delete()
 #         return JsonResponse("Xóa môn học thành công!",safe=False)
 
-@csrf_exempt
-def CourseAndClass(request):
-    if request.method == 'GET':
-        course_list = []
-        courses=m.Course.objects.all()
-        for course in courses:
-            # Get all classes related to this course
-            classes=m.Class.objects.filter(course_id=course.course_id)
-            class_data = []
-            for cls in classes:
-                # Get timetables for this class
-                timetables=m.ClassTimetable.objects.filter(class_field_id=cls.class_id)
-                timetable_data = [
-                    {
-                        'day_of_week': t.day_of_week,
-                        'start_time': t.start_time,
-                        'end_time': t.end_time
-                    }
-                    for t in timetables
-                ]
-                class_data.append({
-                    'class_id': cls.class_id,
-                    'class_name': cls.class_name,
-                    'class_semester': cls.class_semester,
-                    'timetables': timetable_data
-                })
-            course_list.append({
-                'course_id': course.course_id,
-                'course_name': course.course_name,
-                'course_semester': course.course_semester,
-                'course_midterm_coeff': course.course_midterm_coeff,
-                'course_final_coeff': course.course_final_coeff,
-                'course_credit': course.course_credit,
-                'classes': class_data
-            })
-        return JsonResponse(course_list, safe=False)
+# @csrf_exempt
+# def CourseAndClass(request):
+#     if request.method == 'GET':
+#         course_list = []
+#         courses=m.Course.objects.all()
+#         for course in courses:
+#             # Get all classes related to this course
+#             classes=m.Class.objects.filter(course_id=course.course_id)
+#             class_data = []
+#             for cls in classes:
+#                 # Get timetables for this class
+#                 timetables=m.ClassTimetable.objects.filter(class_field_id=cls.class_id)
+#                 timetable_data = [
+#                     {
+#                         'day_of_week': t.day_of_week,
+#                         'start_time': t.start_time,
+#                         'end_time': t.end_time
+#                     }
+#                     for t in timetables
+#                 ]
+#                 class_data.append({
+#                     'class_id': cls.class_id,
+#                     'class_name': cls.class_name,
+#                     'class_semester': cls.class_semester,
+#                     'timetables': timetable_data
+#                 })
+#             course_list.append({
+#                 'course_id': course.course_id,
+#                 'course_name': course.course_name,
+#                 'course_semester': course.course_semester,
+#                 'course_midterm_coeff': course.course_midterm_coeff,
+#                 'course_final_coeff': course.course_final_coeff,
+#                 'course_credit': course.course_credit,
+#                 'classes': class_data
+#             })
+#         return JsonResponse(course_list, safe=False)
 
-@csrf_exempt
-def CSVUploadCourse(request):
-    if request.method == 'POST':
-        # Step 1: Check if a file was uploaded
-        csv_file = request.FILES.get('file')
-        if not csv_file:
-            return JsonResponse({'error': 'No CSV file uploaded'}, status=400)
+# @csrf_exempt
+# def CSVUploadCourse(request):
+#     if request.method == 'POST':
+#         # Step 1: Check if a file was uploaded
+#         csv_file = request.FILES.get('file')
+#         if not csv_file:
+#             return JsonResponse({'error': 'No CSV file uploaded'}, status=400)
 
-        try:
-            # Step 2: Read CSV with pandas
-            df = pd.read_csv(csv_file)
+#         try:
+#             # Step 2: Read CSV with pandas
+#             df = pd.read_csv(csv_file)
 
-            # Validate required columns exist
-            required_columns = [
-                'course_name',
-                'course_semester',
-                'class_is_active',
-                'course_midterm_coeff',
-                'course_final_coeff',
-            ]
-            if not all(col in df.columns for col in required_columns):
-                return JsonResponse({'error': f'Thiếu trường thông tin. Expected: {required_columns}'})
+#             # Validate required columns exist
+#             required_columns = [
+#                 'course_name',
+#                 'course_semester',
+#                 'class_is_active',
+#                 'course_midterm_coeff',
+#                 'course_final_coeff',
+#             ]
+#             if not all(col in df.columns for col in required_columns):
+#                 return JsonResponse({'error': f'Thiếu trường thông tin. Expected: {required_columns}'})
 
-            # Step 3: Iterate over rows and use CourseSerializer to save
-            success_count = 0
-            errors = []
+#             # Step 3: Iterate over rows and use CourseSerializer to save
+#             success_count = 0
+#             errors = []
 
-            for index, row in df.iterrows():
-                # Convert row to dict
-                data = row.to_dict()
+#             for index, row in df.iterrows():
+#                 # Convert row to dict
+#                 data = row.to_dict()
 
-                # Convert "class_is_active" to Python boolean if needed
-                if isinstance(data.get('class_is_active'), str):
-                    data['class_is_active'] = data['class_is_active'].strip().lower() in ['true', '1', 'yes']
+#                 # Convert "class_is_active" to Python boolean if needed
+#                 if isinstance(data.get('class_is_active'), str):
+#                     data['class_is_active'] = data['class_is_active'].strip().lower() in ['true', '1', 'yes']
 
-                serializer=s.CourseSerializer(data=data)
-                if serializer.is_valid():
-                    serializer.save()
-                    success_count += 1
-                else:
-                    errors.append({'row': index + 1, 'errors': serializer.errors})
+#                 serializer=s.CourseSerializer(data=data)
+#                 if serializer.is_valid():
+#                     serializer.save()
+#                     success_count += 1
+#                 else:
+#                     errors.append({'row': index + 1, 'errors': serializer.errors})
 
-            return JsonResponse({
-                'message': f'{success_count} courses imported successfully.',
-                'errors': errors,
-            })
+#             return JsonResponse({
+#                 'message': f'{success_count} courses imported successfully.',
+#                 'errors': errors,
+#             })
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)})
+#         except Exception as e:
+#             return JsonResponse({'error': str(e)})
         
 @csrf_exempt
 def ReportAPI(request, user_id=0): #This post method is currently not available (but it still exists to insert values into the tables)

@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from MainApp.models import Student
-from MainApp.serializers import StudentSerializer, StudentWithIDSerializer
+from MainApp.models import Student, Enrollment
+from MainApp.serializers import StudentSerializer, StudentWithIDSerializer, EnrollmentGradeSubjectSerializer
 
 class StudentController(APIView):
     def get(self, request):
@@ -33,3 +33,9 @@ class StudentController(APIView):
             return Response("Xóa học sinh thành công!")
         except Student.DoesNotExist:
             return Response("Không tìm thấy học sinh!", status=status.HTTP_404_NOT_FOUND)
+        
+class StudentGradeController(APIView):
+    def get(request, sid):
+        enrollment = Enrollment.objects.filter(student = sid)
+        enrollment_serializer = EnrollmentGradeSubjectSerializer(enrollment,many=True)
+        return Response(enrollment_serializer.data)

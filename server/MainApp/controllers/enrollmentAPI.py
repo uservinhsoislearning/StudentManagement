@@ -1,13 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import F, ExpressionWrapper, DurationField, Avg, Max, Min
-from django.db.models.functions import Now, Extract
-from django.template.loader import render_to_string
-from django.core.mail import EmailMultiAlternatives
-import server.settings as settings
+
 from MainApp.models import Enrollment
-from MainApp.serializers import EnrollmentSerializer
+from MainApp.serializers import EnrollmentSerializer, EnrollmentGradeSerializer, StudentWithIDSerializer
 
 class EnrollmentController(APIView):
     def post(self, request):
@@ -61,8 +57,22 @@ class SendAttendanceController(APIView):
     pass
 
 class EnrollmentScoreController(APIView):
-    # ... [Logic] ...
-    pass
+    def get(request, cid):
+        try:
+            enrollment = Enrollment.objects.filter(class_field = cid)
+            enrollment_serializer = EnrollmentGradeSerializer(enrollment,many=True)
+            return Response(enrollment_serializer.data)
+        except Enrollment.DoesNotExist:
+            return Response("Không tìm thấy điểm trong lớp!", status=status.HTTP_404_NOT_FOUND)
+        
+    def post(request, cid):
+        try:
+            enrollment = Enrollment.objects.filter(class_field_id = cid)
+            students = [cs.student for cs in enrollment]
+            students_serializer = StudentWithIDSerializer(students, many=True)
+            return Response(students_serializer.data)
+        except Enrollment.DoesNotExist:
+            return Response("Không tìm được lớp!", status=status.HTTP_404_NOT_FOUND)
 
 class ClassStatsController(APIView):
     # ... [Logic] ...
