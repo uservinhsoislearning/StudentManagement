@@ -62,9 +62,11 @@ urlpatterns = [
 
     re_path(r'^api/classes/(?P<class_id>\d+)/students/(?P<student_id>\d+)/grades$', views.EnrollmentScoreAPI),
 
-    re_path(r'^api/classes/(?P<cid>\d+)/attendance$', views.AttendanceRecordAPI),
-    re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)/attendance$', views.AttendanceRecordAPI),
+    # Get attendance and tick true false
+    re_path(r'^api/classes/(?P<cid>\d+)/attendance$', controllers.enrollmentAPI.AttendanceController.as_view()),
+    re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)/attendance$', controllers.enrollmentAPI.AttendanceController.as_view()),
 
+    # Send attendance report to parent email
     re_path(r'^api/classes/(?P<cid>\d+)/send-attendance$', views.sendAttendance),
 
     re_path(r'^api/classes/(?P<cid>\d+)/statistics$', views.getClassStats),

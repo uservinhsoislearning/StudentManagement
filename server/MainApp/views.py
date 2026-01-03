@@ -535,83 +535,83 @@ def EnrollmentScoreAPI(request, class_id=0, student_id=0):
         except m.Enrollment.DoesNotExist:
             return JsonResponse("Không tìm thấy học sinh trong lớp!", safe=False)
 
-@csrf_exempt
-def AttendanceRecordAPI(request, cid=0, sid=0):
-    if request.method == 'GET':
-        closest = (
-            m.Attendance.objects.filter(class_field_id=cid)
-            .annotate(
-                time_diff=ExpressionWrapper(
-                    Now() - F('timestamp'),
-                    output_field=DurationField()
-                )
-            )
-            .annotate(
-                seconds_diff=Extract(F('time_diff'), 'epoch')
-            )
-            .order_by('seconds_diff')
-            .values('timestamp__date')
-            .first()
-        )
+# @csrf_exempt
+# def AttendanceRecordAPI(request, cid=0, sid=0):
+#     if request.method == 'GET':
+#         closest = (
+#             m.Attendance.objects.filter(class_field_id=cid)
+#             .annotate(
+#                 time_diff=ExpressionWrapper(
+#                     Now() - F('timestamp'),
+#                     output_field=DurationField()
+#                 )
+#             )
+#             .annotate(
+#                 seconds_diff=Extract(F('time_diff'), 'epoch')
+#             )
+#             .order_by('seconds_diff')
+#             .values('timestamp__date')
+#             .first()
+#         )
 
-        if not closest:
-            return JsonResponse([], safe=False)
+#         if not closest:
+#             return JsonResponse([], safe=False)
 
-        closest_date = closest['timestamp__date']
-        attendance = m.Attendance.objects.filter(class_field_id=cid, timestamp__date=closest_date)
-        attendance_serializer = s.AttendanceSerializer(attendance, many=True)
-        return JsonResponse(attendance_serializer.data, safe=False)
+#         closest_date = closest['timestamp__date']
+#         attendance = m.Attendance.objects.filter(class_field_id=cid, timestamp__date=closest_date)
+#         attendance_serializer = s.AttendanceSerializer(attendance, many=True)
+#         return JsonResponse(attendance_serializer.data, safe=False)
 
-    elif request.method == 'POST':
-        try:
-            if not m.Class.objects.filter(class_id=cid).exists():
-                return JsonResponse({"error": "Lớp không tồn tại!"}, status=404)
+#     elif request.method == 'POST':
+#         try:
+#             if not m.Class.objects.filter(class_id=cid).exists():
+#                 return JsonResponse({"error": "Lớp không tồn tại!"}, status=404)
 
-            enrollments = m.Enrollment.objects.filter(class_field_id=cid)
-            if not enrollments.exists():
-                return JsonResponse({"error": "Không có học sinh nào trong lớp này!"}, status=404)
+#             enrollments = m.Enrollment.objects.filter(class_field_id=cid)
+#             if not enrollments.exists():
+#                 return JsonResponse({"error": "Không có học sinh nào trong lớp này!"}, status=404)
 
-            created_records = []
-            for enrollment in enrollments:
-                attendance = m.Attendance.objects.create(
-                    class_field_id=cid,
-                    student=enrollment.student_id
-                )
-                created_records.append(attendance)
+#             created_records = []
+#             for enrollment in enrollments:
+#                 attendance = m.Attendance.objects.create(
+#                     class_field_id=cid,
+#                     student=enrollment.student_id
+#                 )
+#                 created_records.append(attendance)
 
-            serializer = s.AttendanceSerializer(created_records, many=True)
-            return JsonResponse({"message": "Tạo điểm danh thành công!", "data": serializer.data}, safe=False)
+#             serializer = s.AttendanceSerializer(created_records, many=True)
+#             return JsonResponse({"message": "Tạo điểm danh thành công!", "data": serializer.data}, safe=False)
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+#         except Exception as e:
+#             return JsonResponse({"error": str(e)}, status=500)
 
-    elif request.method == 'PATCH':
-        try:
-            closest = (
-                m.Attendance.objects.filter(class_field_id=cid, student=sid)
-                .annotate(
-                    time_diff=ExpressionWrapper(
-                        Now() - F('timestamp'),
-                        output_field=DurationField()
-                    )
-                )
-                .annotate(
-                    seconds_diff=Extract(F('time_diff'), 'epoch')
-                )
-                .order_by('seconds_diff')
-                .first()
-            )
+#     elif request.method == 'PATCH':
+#         try:
+#             closest = (
+#                 m.Attendance.objects.filter(class_field_id=cid, student=sid)
+#                 .annotate(
+#                     time_diff=ExpressionWrapper(
+#                         Now() - F('timestamp'),
+#                         output_field=DurationField()
+#                     )
+#                 )
+#                 .annotate(
+#                     seconds_diff=Extract(F('time_diff'), 'epoch')
+#                 )
+#                 .order_by('seconds_diff')
+#                 .first()
+#             )
 
-            if not closest:
-                return JsonResponse({"error": "Attendance record not found."}, status=404)
+#             if not closest:
+#                 return JsonResponse({"error": "Attendance record not found."}, status=404)
 
-            closest.is_present = not closest.is_present
-            closest.save()
+#             closest.is_present = not closest.is_present
+#             closest.save()
 
-            return JsonResponse({"message": "Student marked as present."}) if closest.is_present else JsonResponse({"message": "Student marked as NOT present."})
+#             return JsonResponse({"message": "Student marked as present."}) if closest.is_present else JsonResponse({"message": "Student marked as NOT present."})
 
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+#         except Exception as e:
+#             return JsonResponse({"error": str(e)}, status=500)
 
 # FIX THIS BECAUSE RELATING TO PARENT
 @csrf_exempt
