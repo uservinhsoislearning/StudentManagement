@@ -40,6 +40,9 @@ urlpatterns = [
     re_path(r'^api/classes/(?P<cid>\d+)/grades$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/get-students$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
 
+    # Lấy điểm chấm điểm học sinh trong lớp
+    re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)/grades$', controllers.enrollmentAPI.EnrollmentScoreController.as_view()),
+
     # Assignment CRUD
     re_path(r'^api/classes/(?P<cid>\d+)/assignments$', controllers.assignmentAPI.AssignmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/assignments-file$', controllers.assignmentAPI.AssignmentFileController.as_view()),
@@ -57,11 +60,9 @@ urlpatterns = [
     re_path(r'^api/messages$', controllers.miscAPI.MessageController.as_view()),
     re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', controllers.miscAPI.MessageController.as_view()),
 
-    re_path(r'^api/registrations/(?P<cid>\d+)/student/(?P<sid>\d+)$', views.registrationAPI),
-
-    re_path(r'^api/registrations/registered/(?P<sid>\d+)$', views.getRegistrated),
-
-    re_path(r'^api/classes/(?P<class_id>\d+)/students/(?P<student_id>\d+)/grades$', views.EnrollmentScoreAPI),
+    # Register student into a class (Học sinh đăng ký vào lớp)
+    re_path(r'^api/registrations/(?P<cid>\d+)/student/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
+    re_path(r'^api/registrations/registered/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
 
     # Get attendance and tick true false
     re_path(r'^api/classes/(?P<cid>\d+)/attendance$', controllers.enrollmentAPI.AttendanceController.as_view()),
@@ -70,9 +71,11 @@ urlpatterns = [
     # Send attendance report to parent email
     re_path(r'^api/classes/(?P<cid>\d+)/send-attendance$', controllers.enrollmentAPI.SendAttendanceController.as_view()),
 
-    re_path(r'^api/classes/(?P<cid>\d+)/statistics$', views.getClassStats),
+    # Get and calculate class's statistics (Max Min Avg)
+    re_path(r'^api/classes/(?P<cid>\d+)/statistics$', controllers.enrollmentAPI.ClassStatsController.as_view()),
 
-    re_path(r'^api/classes/(?P<cid>\d+)/details$', views.getMoreDetails),
+    # Lấy thông tin chi tiết của lớp
+    re_path(r'^api/classes/(?P<cid>\d+)/details$', controllers.miscAPI.DetailsController.as_view()),
 
     # Work ((Student) get, submit(post) and (Teacher) grading and delete )
     re_path(r'^api/classes/(?P<cid>\d+)/student/(?P<sid>\d+)/work/(?P<aid>\d+)$', controllers.workAPI.WorkController.as_view()),

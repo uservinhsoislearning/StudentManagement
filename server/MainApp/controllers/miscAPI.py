@@ -4,7 +4,7 @@ from rest_framework import status
 
 from django.utils import timezone
 
-from MainApp.models import Student, Teacher, Report, Message, Userlogin
+from MainApp.models import Student, Teacher, Report, Message, Userlogin, Class, ClassTimetable
 from MainApp.serializers import ReportSerializer, MessageSerializer
 
 class AdminSummaryController(APIView):
@@ -80,3 +80,25 @@ class MessageController(APIView):
             return Response("Không tìm thấy người dùng!", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class DetailsController(APIView):
+    def get(self, request, cid):
+        try:
+            # Get the class and related course name
+            class_obj = Class.objects.select_related('course').get(class_id=cid)
+            course_name = class_obj.course.course_name
+
+            # Get timetable entries
+            timetables = ClassTimetable.objects.filter(class_field=class_obj).values(
+                'day_of_week', 'start_time', 'end_time'
+            )
+
+            # Format the response
+            schedule = list(timetables)
+            return Response({
+                'course_name': course_name,
+                'schedule': schedule
+            })
+
+        except Class.DoesNotExist:
+            return Response("Không tìm thấy lớp!", status=status.HTTP_404_NOT_FOUND)

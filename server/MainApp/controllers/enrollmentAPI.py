@@ -3,12 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from django.core.mail import EmailMultiAlternatives
-from django.db.models import F, ExpressionWrapper, DurationField
+from django.db.models import F, ExpressionWrapper, DurationField, Avg, Max, Min
 from django.db.models.functions import Now, Extract
 from django.template.loader import render_to_string
 import server.settings as settings
 
-from MainApp.models import Enrollment, Attendance, Class, Student
+from MainApp.models import Enrollment, Attendance, Class, Student, Registration
 from MainApp.serializers import EnrollmentSerializer, EnrollmentGradeSerializer, StudentWithIDSerializer, AttendanceSerializer
 
 class EnrollmentController(APIView):
@@ -226,11 +226,92 @@ class EnrollmentScoreController(APIView):
             return Response(students_serializer.data)
         except Enrollment.DoesNotExist:
             return Response("Không tìm được lớp!", status=status.HTTP_404_NOT_FOUND)
+        
+    def put(self, request, cid, sid):
+        if not cid or not sid:
+            return Response("Thiếu class_id hoặc student_id trong URL!", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            enrollment = Enrollment.objects.get(class_field_id=cid, student_id=sid)
+            enrollment_data = request.data
+
+            serializer = EnrollmentSerializer(enrollment, data=enrollment_data, partial=True)  # partial=True allows partial updates
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response("Cập nhật điểm thành công!")
+            else:
+                return Response("Dữ liệu không hợp lệ!", status=status.HTTP_400_BAD_REQUEST)
+        except Enrollment.DoesNotExist:
+            return Response("Không tìm thấy học sinh trong lớp!", status=status.HTTP_404_NOT_FOUND)
 
 class ClassStatsController(APIView):
-    # ... [Logic] ...
-    pass
+    def get(self, request, cid):
+        # Get all grades for this class
+        class_enrollments = Enrollment.objects.filter(class_field_id=cid)
+
+        # Compute statistics
+        stats = class_enrollments.aggregate(
+            maxScore=Max('grade'),
+            minScore=Min('grade'),
+            avgScore=Avg('grade')
+        )
+
+        # Build response
+        grade_data = {
+            'maxScore': stats['maxScore'],
+            'minScore': stats['minScore'],
+            'avgScore': round(stats['avgScore'], 2) if stats['avgScore'] is not None else None
+        }
+
+        return Response(data=grade_data)
 
 class RegistrationController(APIView):
-    # ... [Logic] ...
-    pass
+    def get(self, request, sid):
+        try:
+            # Get all registrations for the student
+            registrations = Registration.objects.filter(student_id=sid).select_related('class_field')
+
+            # Extract class names
+            class_names = [reg.class_field.class_name for reg in registrations if reg.class_field]
+
+            return Response({'registered_classes': class_names})
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def post(self, request, sid, cid):
+        try:
+            # Validate student existence
+            if not Student.objects.filter(student_id=sid).exists():
+                return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
+
+            # Validate class existence
+            if not Class.objects.filter(class_id=cid).exists():
+                return Response('Class does not exist.', status=status.HTTP_404_NOT_FOUND)
+
+            # Register the student to the class
+            registration, created = Registration.objects.get_or_create(
+                student_id=sid,
+                class_id=cid
+            )
+            if created:
+                return Response('Registration successful.', status=status.HTTP_201_CREATED)
+            else:
+                return Response('Already registered for this class.')
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def delete(self, request, sid, cid):
+        try:
+            if not Student.objects.filter(student_id=sid).exists():
+                return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
+
+            registration = Registration.objects.get(student_id=sid, class_id=cid)
+            registration.delete()
+            return Response('Hủy đăng ký lớp thành công.', status=200)
+
+        except Registration.DoesNotExist:
+            return Response('Không tồn tại!', status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

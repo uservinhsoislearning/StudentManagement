@@ -41,7 +41,7 @@ class StudentGradeController(APIView):
         enrollment = Enrollment.objects.filter(student = sid)
         enrollment_serializer = EnrollmentGradeSubjectSerializer(enrollment,many=True)
         return Response(enrollment_serializer.data)
-    
+
 class StudentSummaryController(APIView):
     def get(self, request, sid):
         enrollments = Enrollment.objects.filter(student = sid)
