@@ -56,11 +56,11 @@ urlpatterns = [
     # Get class's timetable
     re_path(r'^api/student/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
 
-    # Send messages
+    # Send messages (future work)
     re_path(r'^api/messages$', controllers.miscAPI.MessageController.as_view()),
     re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', controllers.miscAPI.MessageController.as_view()),
 
-    # Register student into a class (Học sinh đăng ký vào lớp)
+    # Register student into a class (Học sinh đăng ký vào lớp change this!!!!)
     re_path(r'^api/registrations/(?P<cid>\d+)/student/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
     re_path(r'^api/registrations/registered/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
 
