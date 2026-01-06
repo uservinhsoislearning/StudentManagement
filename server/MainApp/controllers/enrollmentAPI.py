@@ -8,10 +8,19 @@ from django.db.models.functions import Now, Extract
 from django.template.loader import render_to_string
 import server.settings as settings
 
-from MainApp.models import Enrollment, Attendance, Class, Student, Registration
+from MainApp.models import Enrollment, Attendance, Class, Student
 from MainApp.serializers import EnrollmentSerializer, EnrollmentGradeSerializer, StudentWithIDSerializer, AttendanceSerializer
 
 class EnrollmentController(APIView):
+    def get(self, request, sid):
+        try:
+            # Get all registrations for the student
+            enrollments = Enrollment.objects.filter(student_id=sid).select_related('class_field')
+            class_names = [reg.class_field.class_name for reg in enrollments if reg.class_field]
+            return Response({'registered_classes': class_names})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
     def post(self, request):
         enrollment_data = request.data
         enrollment_data['withdrawal_date'] = None 
@@ -265,53 +274,53 @@ class ClassStatsController(APIView):
 
         return Response(data=grade_data)
 
-class RegistrationController(APIView):
-    def get(self, request, sid):
-        try:
-            # Get all registrations for the student
-            registrations = Registration.objects.filter(student_id=sid).select_related('class_field')
+# class RegistrationController(APIView):
+#     def get(self, request, sid):
+#         try:
+#             # Get all registrations for the student
+#             registrations = Registration.objects.filter(student_id=sid).select_related('class_field')
 
-            # Extract class names
-            class_names = [reg.class_field.class_name for reg in registrations if reg.class_field]
+#             # Extract class names
+#             class_names = [reg.class_field.class_name for reg in registrations if reg.class_field]
 
-            return Response({'registered_classes': class_names})
+#             return Response({'registered_classes': class_names})
 
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    def post(self, request, sid, cid):
-        try:
-            # Validate student existence
-            if not Student.objects.filter(student_id=sid).exists():
-                return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
+#     def post(self, request, sid, cid):
+#         try:
+#             # Validate student existence
+#             if not Student.objects.filter(student_id=sid).exists():
+#                 return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
 
-            # Validate class existence
-            if not Class.objects.filter(class_id=cid).exists():
-                return Response('Class does not exist.', status=status.HTTP_404_NOT_FOUND)
+#             # Validate class existence
+#             if not Class.objects.filter(class_id=cid).exists():
+#                 return Response('Class does not exist.', status=status.HTTP_404_NOT_FOUND)
 
-            # Register the student to the class
-            registration, created = Registration.objects.get_or_create(
-                student_id=sid,
-                class_id=cid
-            )
-            if created:
-                return Response('Registration successful.', status=status.HTTP_201_CREATED)
-            else:
-                return Response('Already registered for this class.')
+#             # Register the student to the class
+#             registration, created = Registration.objects.get_or_create(
+#                 student_id=sid,
+#                 class_id=cid
+#             )
+#             if created:
+#                 return Response('Registration successful.', status=status.HTTP_201_CREATED)
+#             else:
+#                 return Response('Already registered for this class.')
 
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def delete(self, request, sid, cid):
-        try:
-            if not Student.objects.filter(student_id=sid).exists():
-                return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
+#     def delete(self, request, sid, cid):
+#         try:
+#             if not Student.objects.filter(student_id=sid).exists():
+#                 return Response('Student does not exist.', status=status.HTTP_404_NOT_FOUND)
 
-            registration = Registration.objects.get(student_id=sid, class_id=cid)
-            registration.delete()
-            return Response('Hủy đăng ký lớp thành công.', status=200)
+#             registration = Registration.objects.get(student_id=sid, class_id=cid)
+#             registration.delete()
+#             return Response('Hủy đăng ký lớp thành công.', status=200)
 
-        except Registration.DoesNotExist:
-            return Response('Không tồn tại!', status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Registration.DoesNotExist:
+#             return Response('Không tồn tại!', status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

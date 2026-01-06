@@ -140,36 +140,36 @@ class Enrollment(models.Model):
     class Meta:
         db_table = 'enrollment'
 
-class Message(models.Model):
-    message_id = models.AutoField(primary_key=True)
+# class Message(models.Model):
+#     message_id = models.AutoField(primary_key=True)
 
-    sender = models.ForeignKey(
-        'Userlogin',
-        on_delete=models.CASCADE,
-        related_name='sent_messages'
-    )
-    receiver = models.ForeignKey(
-        'Userlogin',
-        on_delete=models.CASCADE,
-        related_name='received_messages'
-    )
+#     sender = models.ForeignKey(
+#         'Userlogin',
+#         on_delete=models.CASCADE,
+#         related_name='sent_messages'
+#     )
+#     receiver = models.ForeignKey(
+#         'Userlogin',
+#         on_delete=models.CASCADE,
+#         related_name='received_messages'
+#     )
 
-    content = models.TextField(max_length=5000)
-    timestamp = models.DateTimeField(default=timezone.now)
-    is_read = models.BooleanField(default=False)  # Track if the receiver has read the message
+#     content = models.TextField(max_length=5000)
+#     timestamp = models.DateTimeField(default=timezone.now)
+#     is_read = models.BooleanField(default=False)  # Track if the receiver has read the message
 
-    class Meta:
-        db_table = 'message'
-        ordering = ['-timestamp']
+#     class Meta:
+#         db_table = 'message'
+#         ordering = ['-timestamp']
 
-class Registration(models.Model):
-    connect_id = models.AutoField(primary_key=True)
-    student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
-    class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
+# class Registration(models.Model):
+#     connect_id = models.AutoField(primary_key=True)
+#     student = models.ForeignKey('Student', on_delete=models.CASCADE, db_column='student_id')
+#     class_field = models.ForeignKey('Class', on_delete=models.CASCADE, db_column='class_id')
 
-    class Meta:
-        db_table = 'registration'
-        unique_together = ('student', 'class_field') 
+#     class Meta:
+#         db_table = 'registration'
+#         unique_together = ('student', 'class_field') 
 
 class Report(models.Model):
     report_id = models.AutoField(primary_key=True)
@@ -243,24 +243,24 @@ class Teacher(models.Model):
     class Meta:
         db_table = 'teacher'
 
-class CourseTeacher(models.Model):
-    connect_id = models.AutoField(primary_key=True)
+# class CourseTeacher(models.Model):
+#     connect_id = models.AutoField(primary_key=True)
 
-    course = models.ForeignKey(
-        'Course',
-        on_delete=models.CASCADE,
-        db_column='course_id'
-    )
+#     course = models.ForeignKey(
+#         'Course',
+#         on_delete=models.CASCADE,
+#         db_column='course_id'
+#     )
 
-    teacher = models.ForeignKey(
-        'Teacher',
-        on_delete=models.CASCADE,
-        db_column='teacher_id'
-    )
+#     teacher = models.ForeignKey(
+#         'Teacher',
+#         on_delete=models.CASCADE,
+#         db_column='teacher_id'
+#     )
 
-    class Meta:
-        db_table = 'course_teacher'
-        unique_together = ('course', 'teacher')
+#     class Meta:
+#         db_table = 'course_teacher'
+#         unique_together = ('course', 'teacher')
 
 def work_upload_path(instance, filename):
     return os.path.join('works', f"assignment_{instance.assignment.assignment_id}", f"student_{instance.student.student_id}", filename)

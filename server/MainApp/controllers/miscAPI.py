@@ -4,8 +4,8 @@ from rest_framework import status
 
 from django.utils import timezone
 
-from MainApp.models import Student, Teacher, Report, Message, Userlogin, Class, ClassTimetable
-from MainApp.serializers import ReportSerializer, MessageSerializer
+from MainApp.models import Student, Teacher, Report, Class, ClassTimetable
+from MainApp.serializers import ReportSerializer
 
 class AdminSummaryController(APIView):
     def get(self, request):
@@ -35,51 +35,51 @@ class ReportController(APIView):
             return Response("Report submitted successfully", status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class MessageController(APIView):
-    def get(self, request, user1_id, user2_id):
-        try:
-            messages_user1_to_user2 = Message.objects.filter(
-                sender_id=user1_id, receiver_id=user2_id
-            )
-            # Get messages from user2 to user1
-            messages_user2_to_user1 = Message.objects.filter(
-                sender_id=user2_id, receiver_id=user1_id
-            )
-            # Combine the two querysets
-            all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
+# class MessageController(APIView):
+#     def get(self, request, user1_id, user2_id):
+#         try:
+#             messages_user1_to_user2 = Message.objects.filter(
+#                 sender_id=user1_id, receiver_id=user2_id
+#             )
+#             # Get messages from user2 to user1
+#             messages_user2_to_user1 = Message.objects.filter(
+#                 sender_id=user2_id, receiver_id=user1_id
+#             )
+#             # Combine the two querysets
+#             all_messages = messages_user1_to_user2.union(messages_user2_to_user1).order_by('timestamp')
 
-            serializer = MessageSerializer(all_messages, many=True)
-            return Response(serializer.data)
+#             serializer = MessageSerializer(all_messages, many=True)
+#             return Response(serializer.data)
 
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    def post(self, request):
-        try:
-            sender_id = request.data.get('sender_id')
-            receiver_id = request.data.get('receiver_id')
-            content = request.data.get('content')
+#     def post(self, request):
+#         try:
+#             sender_id = request.data.get('sender_id')
+#             receiver_id = request.data.get('receiver_id')
+#             content = request.data.get('content')
 
-            if not all([sender_id, receiver_id, content]):
-                return Response("Missing required fields", status=status.HTTP_400_BAD_REQUEST)
+#             if not all([sender_id, receiver_id, content]):
+#                 return Response("Missing required fields", status=status.HTTP_400_BAD_REQUEST)
 
-            sender = Userlogin.objects.get(user_id=sender_id)
-            receiver = Userlogin.objects.get(user_id=receiver_id)
+#             sender = Userlogin.objects.get(user_id=sender_id)
+#             receiver = Userlogin.objects.get(user_id=receiver_id)
 
-            message = Message.objects.create(
-                sender=sender,
-                receiver=receiver,
-                content=content,
-                timestamp=timezone.now()
-            )
+#             message = Message.objects.create(
+#                 sender=sender,
+#                 receiver=receiver,
+#                 content=content,
+#                 timestamp=timezone.now()
+#             )
 
-            message_serializer = MessageSerializer(message)
-            return Response(message_serializer.data)
+#             message_serializer = MessageSerializer(message)
+#             return Response(message_serializer.data)
 
-        except Userlogin.DoesNotExist:
-            return Response("Không tìm thấy người dùng!", status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#         except Userlogin.DoesNotExist:
+#             return Response("Không tìm thấy người dùng!", status=status.HTTP_404_NOT_FOUND)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class DetailsController(APIView):
     def get(self, request, cid):

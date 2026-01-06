@@ -174,13 +174,13 @@ class EnrollmentGradeSubjectSerializer(serializers.ModelSerializer):
             'grade'
         )
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = m.Registration
-        fields = (
-            'student',
-            'class_field'
-        )
+# class RegistrationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = m.Registration
+#         fields = (
+#             'student',
+#             'class_field'
+#         )
 
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
@@ -239,10 +239,10 @@ class UserloginSerializer(serializers.ModelSerializer):
             'relatedid'
         )
 
-class MessageSerializer(serializers.ModelSerializer):
-    sender = UserloginSerializer(read_only=True)
-    receiver = UserloginSerializer(read_only=True)
+# class MessageSerializer(serializers.ModelSerializer):
+#     sender = UserloginSerializer(read_only=True)
+#     receiver = UserloginSerializer(read_only=True)
 
-    class Meta:
-        model = m.Message
-        fields = ['message_id', 'sender', 'receiver', 'content', 'timestamp', 'is_read']
+#     class Meta:
+#         model = m.Message
+#         fields = ['message_id', 'sender', 'receiver', 'content', 'timestamp', 'is_read']

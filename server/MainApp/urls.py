@@ -1,5 +1,5 @@
 from django.urls import re_path
-from MainApp import views
+# from MainApp import views
 from . import controllers
 
 urlpatterns = [
@@ -26,6 +26,9 @@ urlpatterns = [
     re_path(r'^api/classes/students$', controllers.enrollmentAPI.EnrollmentController.as_view()),
     re_path(r'^api/classes/(?P<cid>\d+)/students/(?P<sid>\d+)$', controllers.enrollmentAPI.EnrollmentController.as_view()),
 
+    # Get all classes a student has registered
+    re_path(r'^api/registrations/registered/(?P<sid>\d+)$', controllers.enrollmentAPI.EnrollmentController.as_view()),
+
     # Semester CRUD
     re_path(r'^api/semesters$', controllers.semesterAPI.SemesterController.as_view()),
     re_path(r'^api/semesters/(?P<sem_id>\d+)$', controllers.semesterAPI.SemesterController.as_view()),
@@ -51,18 +54,14 @@ urlpatterns = [
     re_path(r'^api/course-classes-both$', controllers.courseAPI.CourseClassController.as_view()),
 
     # Get grade student
-    re_path(r'^api/student/(?P<sid>\d+)/grades$', controllers.studentAPI.StudentGradeController.as_view()),
+    re_path(r'^api/students/(?P<sid>\d+)/grades$', controllers.studentAPI.StudentGradeController.as_view()),
 
     # Get class's timetable
-    re_path(r'^api/student/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
+    re_path(r'^api/students/(?P<sid>\d+)/schedule$', controllers.classAPI.TimetableController.as_view()),
 
-    # Send messages (future work)
-    re_path(r'^api/messages$', controllers.miscAPI.MessageController.as_view()),
-    re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', controllers.miscAPI.MessageController.as_view()),
-
-    # Register student into a class (Học sinh đăng ký vào lớp change this!!!!)
-    re_path(r'^api/registrations/(?P<cid>\d+)/student/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
-    re_path(r'^api/registrations/registered/(?P<sid>\d+)$', controllers.enrollmentAPI.RegistrationController.as_view()),
+    # Send messages (deprecated)
+    # re_path(r'^api/messages$', controllers.miscAPI.MessageController.as_view()),
+    # re_path(r'^api/messages/usr1/(?P<user1_id>\d+)/usr2/(?P<user2_id>\d+)$', controllers.miscAPI.MessageController.as_view()),
 
     # Get attendance and tick true false
     re_path(r'^api/classes/(?P<cid>\d+)/attendance$', controllers.enrollmentAPI.AttendanceController.as_view()),
