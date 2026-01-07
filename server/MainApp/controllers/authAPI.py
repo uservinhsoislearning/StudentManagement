@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import check_password
 from django.core.mail import EmailMultiAlternatives
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.db.models import Q
+from django.template.loader import render_to_string
 import server.settings as settings
 
 from MainApp.models import Userlogin
@@ -129,13 +130,12 @@ class ForgotPasswordController(APIView):
             reset_link = f"http://localhost:5173/reset-password?token={signed_token}"
             
             # Nội dung email
-            subject = 'Đặt lại mật khẩu'
-            html_content = f'''
-                <p>Xin chào {user.username},</p>
-                <p>Bạn đã yêu cầu đặt lại mật khẩu.</p>
-                <p>Vui lòng click vào link dưới đây (Link hết hạn sau 10 phút):</p>
-                <p><a href="{reset_link}"><b>ĐẶT LẠI MẬT KHẨU NGAY</b></a></p>
-            '''
+            subject = 'Đặt lại mật khẩu - BKSystem'
+            context = {
+                'username': user.username,
+                'reset_link': reset_link
+            }
+            html_content = render_to_string('forgot-pass.html', context)
             
             msg = EmailMultiAlternatives(subject, "", settings.EMAIL_HOST_USER, [email])
             msg.attach_alternative(html_content, "text/html")

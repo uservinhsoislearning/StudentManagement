@@ -181,7 +181,7 @@ class SendAttendanceController(APIView):
                 try:
                     sid = record.student
                     student = Student.objects.get(student_id=sid)
-                    parent_email = student.parent_email
+                    parent_email = [student.parent_email]
                     if not parent_email:
                         print(f"Skipping student {student.student_name}: No parent_email found.")
                         continue
